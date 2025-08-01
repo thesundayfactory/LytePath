@@ -118,8 +118,9 @@ struct ResultViewNew: View {
 //                        }
 //                    )
                 
-                initializeQueue()
-                matchingCCriteria()
+                //initializeQueue()
+                //matchingCCriteria()
+                backtrackAllCCriteriaPaths()
                 mStructures = makeMeaningPaths()
             }
             .navigationTitle("Analysis Result")
@@ -304,45 +305,97 @@ struct ResultViewNew: View {
     }
     
     // MARK: - Data processing
-    // cStructures 만들기
-    func initializeQueue(){
-        // ContentView에서 선택한 전해질과 관련된 rootCriteria만
-        let relatedRootCriterias = rootCriteriaList.filter{data.selectedElectrolytes.contains($0.electrolyte)}
-        //print("Related root criterias: \(relatedRootCriterias)")
-        for rootCriteria in relatedRootCriterias { // relatedRootCriteria 중에서도 만족하는 것만 큐에 넣기
-            if cCriteriaCalculationManager.evaluatecCriteria(labValues: data.labValues, parameter: rootCriteria.para, threshold: rootCriteria.thres, direction: rootCriteria.direction) {
-                self.matchedcCriteria.append(rootCriteria)
-                self.waitingCriteriaQueue.append((current: rootCriteria, path: [rootCriteria]))
+//    // cStructures 만들기
+//    func initializeQueue(){
+//        // ContentView에서 선택한 전해질과 관련된 rootCriteria만
+//        let relatedRootCriterias = rootCriteriaList.filter{data.selectedElectrolytes.contains($0.electrolyte)}
+//        //print("Related root criterias: \(relatedRootCriterias)")
+//        for rootCriteria in relatedRootCriterias { // relatedRootCriteria 중에서도 만족하는 것만 큐에 넣기
+//            if cCriteriaCalculationManager.evaluatecCriteria(labValues: data.labValues, parameter: rootCriteria.para, threshold: rootCriteria.thres, direction: rootCriteria.direction) {
+//                self.matchedcCriteria.append(rootCriteria)
+//                self.waitingCriteriaQueue.append((current: rootCriteria, path: [rootCriteria]))
+//            }
+//        }
+//        //print("🧩 Root CCriteria IDs: \(relatedRootCriterias)")
+//    }
+//    
+//    func matchingCCriteria() { //waitingCriteriaQueue에는 이미 true가 입증된 것들만 들어있음
+//        while !waitingCriteriaQueue.isEmpty {
+//            let (currentCriteria, path) = waitingCriteriaQueue.removeFirst()
+//            
+//            var isLeaf = true
+//            let nextIDs = currentCriteria.tailCID
+//            let tailCriterias = nextIDs.compactMap { cCriteriaDict[$0] }
+//            for tailCriteria in tailCriterias {
+//                if cCriteriaCalculationManager.evaluatecCriteria(labValues: data.labValues, parameter: tailCriteria.para, threshold: tailCriteria.thres, direction: tailCriteria.direction) {
+//                    matchedcCriteria.append(tailCriteria)
+//                    waitingCriteriaQueue.append((current: tailCriteria, path: path + [tailCriteria]))
+//                    isLeaf = false
+//                }
+//            }
+//            
+//            if isLeaf {
+//                if currentCriteria.meaningID.count != 0{
+//                    matchedcCriteriaPaths.append(path)
+//                }
+//            }
+//        }
+//        //print("🧩 matchedCriterias:: \(matchedcCriteria)")
+//        print("🧩 matchedCriteriaPaths: \(matchedcCriteriaPaths)")
+//        print("🧩 matchedCriteriaPaths: \(matchedcCriteriaPaths.count)")
+//    }
+    
+    //cStructures 만들기 - 백트래킹
+    func backtrackAllCCriteriaPaths() {
+        matchedcCriteria = []
+        matchedcCriteriaPaths = []
+
+        let relatedRootCriterias = rootCriteriaList.filter { data.selectedElectrolytes.contains($0.electrolyte) }
+
+        for root in relatedRootCriterias {
+            if cCriteriaCalculationManager.evaluatecCriteria(labValues: data.labValues, parameter: root.para, threshold: root.thres, direction: root.direction){
+                matchedcCriteria.append(root)
+                if root.meaningID.isEmpty {
+                    dfs(current: root, path: [], temp: [root])
+                } else {
+                    dfs(current: root, path: [root], temp: [])
+                }
             }
         }
-        //print("🧩 Root CCriteria IDs: \(relatedRootCriterias)")
+
+        print("🧩 DFS matchedCriteriaPaths: \(matchedcCriteriaPaths.count)")
+    }
+
+    func dfs(current: CCriteria, path: [CCriteria], temp: [CCriteria]) -> Bool{
+
+        let tailCriterias = current.tailCID.compactMap { cCriteriaDict[$0] }
+
+        var hasValidChild = false
+        for next in tailCriterias {
+            if cCriteriaCalculationManager.evaluatecCriteria(
+                labValues: data.labValues,
+                parameter: next.para,
+                threshold: next.thres,
+                direction: next.direction
+            ) {
+                matchedcCriteria.append(next)
+                if next.meaningID.isEmpty {
+                    hasValidChild = hasValidChild || dfs(current: next, path: path, temp: temp + [next])
+                } else {
+                    hasValidChild = true
+                    dfs(current: next, path: path + temp + [next], temp: [])
+                }
+            }
+        }
+
+        // 끝에 meaningID가 있고, 더 이상 유효한 child가 없을 때만 저장
+        if !hasValidChild && !current.meaningID.isEmpty {
+            matchedcCriteriaPaths.append(path)
+        }
+        
+        return hasValidChild
     }
     
-    func matchingCCriteria() { //waitingCriteriaQueue에는 이미 true가 입증된 것들만 들어있음
-        while !waitingCriteriaQueue.isEmpty {
-            let (currentCriteria, path) = waitingCriteriaQueue.removeFirst()
-            
-            var isLeaf = true
-            let nextIDs = currentCriteria.tailCID
-            let tailCriterias = nextIDs.compactMap { cCriteriaDict[$0] }
-            for tailCriteria in tailCriterias {
-                if cCriteriaCalculationManager.evaluatecCriteria(labValues: data.labValues, parameter: tailCriteria.para, threshold: tailCriteria.thres, direction: tailCriteria.direction) {
-                    matchedcCriteria.append(tailCriteria)
-                    waitingCriteriaQueue.append((current: tailCriteria, path: path + [tailCriteria]))
-                    isLeaf = false
-                }
-            }
-            
-            if isLeaf {
-                if currentCriteria.meaningID.count != 0{
-                    matchedcCriteriaPaths.append(path)
-                }
-            }
-        }
-        //print("🧩 matchedCriterias:: \(matchedcCriteria)")
-        print("🧩 matchedCriteriaPaths: \(matchedcCriteriaPaths)")
-        print("🧩 matchedCriteriaPaths: \(matchedcCriteriaPaths.count)")
-    }
     
     // mStructures 만들기
     func makeMeaningPaths() ->  [[meaningWithTailC]] {
