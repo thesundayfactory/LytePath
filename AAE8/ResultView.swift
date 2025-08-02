@@ -103,7 +103,7 @@ struct ResultViewNew: View {
                 .padding()
             }
             .onAppear {
-                waitingCriteriaQueue = []
+                //waitingCriteriaQueue = []
                 matchedcCriteria = []
                 matchedcCriteriaPaths = []
                 mStructures = []

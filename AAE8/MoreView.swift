@@ -42,6 +42,7 @@ struct InterpretationMoreView: View {
     
     @State private var showFullLogic = false
     
+    @State private var navigateToLogic = false
     
     var body: some View {
         VStack{
@@ -55,6 +56,29 @@ struct InterpretationMoreView: View {
 //                    .padding(.horizontal, 10)
 //                    .padding(.vertical, 4)
 //            }
+            HStack {
+                Spacer()
+                NavigationLink(destination: LogicView(), isActive: $navigateToLogic) {
+                    Button(action: {
+                        navigateToLogic = true
+                    }) {
+                        Image(systemName: "list.bullet.rectangle")
+                            .foregroundColor(.customDarkGreen)
+                        Text("Logic")
+                            .font(.caption)
+                            .bold()
+                            .foregroundColor(.customDarkGreen)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.customWhite.opacity(0.2))
+                    .cornerRadius(8)
+                }
+            }
+            .padding(.trailing, 16)
+            .padding(.top, 10)
+            
+            
             ScrollView{
                 VStack(alignment: .leading) {
                     
@@ -368,9 +392,9 @@ struct InterpretationTreeView: View {
                         .stroke(Color.black.opacity(0.05))
                 )
             }
-            }
-//            .background(backgroundColor(for: depth))
-            .padding(.leading, CGFloat(depth) * 12)
+        }
+//        .background(backgroundColor(for: depth))
+        .padding(.leading, CGFloat(depth) * 12)
             
             if isExpanded{
                 ForEach(node.children) { child in

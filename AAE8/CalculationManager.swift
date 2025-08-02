@@ -359,7 +359,7 @@ struct CMDUtils {
                 let para = c.para.displayName
                 let thres = String(format: "%.2f", c.thres)
                 let dir = c.direction == .high ? "↑" : "↓"
-                criteriaStrs.append("\(prefix) \(para) \(thres) \(dir)")
+                criteriaStrs.append("\(prefix)\(para) \(thres) \(dir)")
             }
         }
         return criteriaStrs.joined(separator: " & ")

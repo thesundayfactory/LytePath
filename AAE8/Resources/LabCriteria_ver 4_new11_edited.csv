@@ -1,10 +1,10 @@
 ID,Electrolyte,parameter,threshold,direction,TailID,MeaningID,Order,Point
 87,pH,PPH,7.35,High,119;95,,1,
-84,K,PK,3.5,High,118;78,,1,
-39,Na,PNa,135,High,114;15,,1,
+84,K,PK,5.5,Low,118;80,,1,
+39,Na,PNa,145,Low,114;27,,1,
 119,pH,PPH,7.45,Low,90;88;89;163,,2,
-118,K,PK,5.5,Low,,22,2,1
-114,Na,PNa,145,Low,,36,2,1
+118,K,PK,3.5,High,,22,2,1
+114,Na,PNa,135,High,,36,2,1
 88,pH,PAG,12,High,123;161,,3,
 80,K,PK,3.5,Low,67;73,23,3,0.5
 27,Na,PNa,135,Low,55;75,37,3,0.5
@@ -39,7 +39,7 @@ ID,Electrolyte,parameter,threshold,direction,TailID,MeaningID,Order,Point
 37,K,UNa,25,Low,,33,13,0.3
 26,Na,UNa,20,Low,,155,13,0.1
 124,pH,PHCO3,22,Low,126;127,,14,0.1
-54,K,UNa,25,High,82;45,,14,0.1
+54,K,UNa,25,High,82;45,158,14,0.1
 28,Na,UNa,20,High,,46,14,0.1
 126,pH,Diff.PCO2,5,High,100;103,3;5,15,0.2
 82,K,TTKG,8,High,,34,15,0.2
