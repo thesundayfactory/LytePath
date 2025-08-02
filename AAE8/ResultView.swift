@@ -146,11 +146,11 @@ struct ResultViewNew: View {
                     .bold()
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(Color.customGray.opacity(0.3))
-                    .foregroundColor(.customDarkBlue)
+                    .background(Color.customLightGreen.opacity(0.3))
+                    .foregroundColor(.customGreen)
                     .overlay(
                             RoundedRectangle(cornerRadius: 5)
-                                .stroke(Color.customDarkBlue, lineWidth: 1) // ✅ 테두리 추가
+                                .stroke(Color.customGreen, lineWidth: 1) // ✅ 테두리 추가
                         )
                     .cornerRadius(5)
             }
@@ -290,7 +290,8 @@ struct ResultViewNew: View {
                     }
                     
                 }
-                Text("💡 Tap 'More' to see possible causes and full reasoning.")
+                Text("💡 Tap 'More' to see other possible causes")
+                    .foregroundColor(.customGray)
             }
         }
         
@@ -892,8 +893,19 @@ struct singlePathTreeView: View {
                                 ArrowCircleView(electrolyte: rootNode.electrolyte, arrow: rootNode.arrow ?? "?")
                             }
                         }
-                        if let title = node.type == .Meaning ? node.meaning?.name : node.disease?.name {
-                            Text(title)
+                        VStack(alignment: .leading){
+                            if let title = node.type == .Meaning ? node.meaning?.name : node.disease?.name {
+                                Text(title)
+                            }
+                            if let disease = node.disease {
+                                if !disease.relatedDID.isEmpty {
+                                    let relatedNames = disease.relatedDID.compactMap({diseaseDict[$0]?.name})
+                                    Text("Related: \(relatedNames.joined(separator: ", "))")
+                                        .font(.caption2)
+                                        .foregroundColor(.customGray)
+                                }
+                            }
+                            
                         }
                         Spacer()
                     if node.type == .Disease{
