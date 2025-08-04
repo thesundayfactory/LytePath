@@ -274,6 +274,17 @@ class MeaningStore {
         let allTailMIDs = Set(mMRelation.map{$0.tailID})
         let rootMIDs = allMIDs.subtracting(allTailMIDs)
         let rootMeanings = rootMIDs.compactMap{all[$0]}
+        let sortedRootMeanings = rootMeanings.sorted {
+            guard let i0 = Electrolyte.displayOrder.firstIndex(of: $0.electrolyte),
+                      let i1 = Electrolyte.displayOrder.firstIndex(of: $1.electrolyte) else {
+                    return false
+                }
+                if i0 != i1 {
+                    return i0 < i1
+                } else {
+                    return $0.order < $1.order
+                }
+        }
         return rootMeanings
     }
     

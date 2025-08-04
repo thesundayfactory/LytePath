@@ -40,97 +40,120 @@ struct ResultViewNew: View {
             )
     }
     //Disease의 route를 전부 저장하는 딕셔너리
-    var diseaseRoute: [Disease: [[String]] ] {
-        var result: [Disease: [[String]] ] = [:]
-
-        let rootMeaning = meaningDict.values.filter { headMIDDictByTailMID[$0.id] == nil }.sorted {
-            guard let i0 = Electrolyte.displayOrder.firstIndex(of: $0.electrolyte),
-                      let i1 = Electrolyte.displayOrder.firstIndex(of: $1.electrolyte) else {
-                    return false
-                }
-                if i0 != i1 {
-                    return i0 < i1
-                } else {
-                    return $0.order < $1.order // order는 Meaning 안의 Double
-                }
-        }
-        for meaning in rootMeaning {
-            let routeDict = CMDUtils.diseaseToFullMeaningRoute(
-                meaning: meaning,
-                meaningDict: meaningDict,
-                diseaesDict: diseaseDict
-            )
-
-            for (disease, routes) in routeDict {
-                for route in routes{
-                    var fullMeaningRouteKey: [String] = route.map { "M"+String($0.id)}
-                    
-                    // Disease head 넣기
-                    let headIDs = disease.resultDID
-                    if let leafM = route.last {
-                        for headID in headIDs {
-                            if leafM.diseaseID.contains(headID) {
-                                fullMeaningRouteKey.append("D"+String(headID))
-                            }
-                        }
-                    }
-                    result[disease, default: []].append(fullMeaningRouteKey)
-                }
-            }
-        }
-
-        return result
+    var diseaseRoute: [Disease: [[String]]] {
+        CMDUtils.buildDiseaseRoute(meaningDict: meaningDict, diseaseDict: diseaseDict)
     }
+//    var diseaseRoute: [Disease: [[String]] ] {
+//        var result: [Disease: [[String]] ] = [:]
+//
+//        let rootMeanings = MeaningStore.shared.rootMeanings
+////        let rootMeaning = meaningDict.values.filter { headMIDDictByTailMID[$0.id] == nil }.sorted {
+////            guard let i0 = Electrolyte.displayOrder.firstIndex(of: $0.electrolyte),
+////                      let i1 = Electrolyte.displayOrder.firstIndex(of: $1.electrolyte) else {
+////                    return false
+////                }
+////                if i0 != i1 {
+////                    return i0 < i1
+////                } else {
+////                    return $0.order < $1.order
+////                }
+////        }
+//        
+//        let routeDict = rootMeanings
+//            .map { CMDUtils.diseaseToFullMeaningRoute(meaning: $0, meaningDict: meaningDict, diseaesDict: diseaseDict) }
+//            .reduce(into: [Disease: [[Meaning]]]() ) { result, dict in
+//                for (disease, routes) in dict {
+//                    result[disease, default: []] += routes
+//                }
+//            }
+//        
+////        for meaning in rootMeanings {
+////            let routeDict = CMDUtils.diseaseToFullMeaningRoute(
+////                meaning: meaning,
+////                meaningDict: meaningDict,
+////                diseaesDict: diseaseDict
+////            )
+//
+//            for (disease, routes) in routeDict {
+//                for route in routes{
+//                    var fullMeaningRouteKey: [String] = route.map { "M"+String($0.id)}
+//                    
+//                    // Disease head 넣기. D계층은 최대 한 층이어야 함. ... > M > D > D 이어야 함 (D > D > D X)
+//                    let headIDs = disease.resultDID
+//                    if let leafM = route.last {
+//                        for headID in headIDs {
+//                            if leafM.diseaseID.contains(headID) {
+//                                fullMeaningRouteKey.append("D"+String(headID))
+//                            }
+//                        }
+//                    }
+//                    result[disease, default: []].append(fullMeaningRouteKey)
+//                }
+//            }
+////        }
+//
+//        return result
+//    }
     
-    typealias criteriaPath = [CCriteria]
-    @State private var waitingCriteriaQueue: [(current: CCriteria, path: criteriaPath)] = []
-    @State private var matchedcCriteria: [CCriteria] = []
-    @State private var matchedcCriteriaPaths: [criteriaPath] = []
-    typealias meaningPath = [meaningWithTailC]
-    @State private var mStructures: [[meaningWithTailC]] = []
-
-//    @State private var meaningPath: [meaningPath] = []
+//    typealias criteriaPath = [CCriteria]
+////    @State private var waitingCriteriaQueue: [(current: CCriteria, path: criteriaPath)] = []
+//    @State private var matchedcCriteria: [CCriteria] = []
+//    @State private var matchedcCriteriaPaths: [criteriaPath] = []
+//    typealias meaningPath = [meaningWithTailC]
+//    @State private var mStructures: [[meaningWithTailC]] = []
     
     var body: some View {
         NavigationStack {
             ScrollView{
                 VStack(spacing: 20) {
-                    selectedElectrolytesHeader
-                    //labDataSection
-                    interpretationSection
-                    topCausesSection
+                    
+                    let (matchedcCriteria, matchedcCriteriaPaths) =
+                        ResultLogic.buildCStructures(
+                            data: data,
+                            rootCriteriaList: rootCriteriaList,
+                            cCriteriaDict: cCriteriaDict
+                        )
+                    
+                    let mStructures =
+                        ResultLogic.buildMStructures(
+                            matchedcCriteriaPaths: matchedcCriteriaPaths,
+                            meaningDict: meaningDict
+                        )
+                    
+                    selectedElectrolytesHeader(
+                        matchedcCriteria: matchedcCriteria,
+                        matchedcCriteriaPaths: matchedcCriteriaPaths,
+                        mStructures: mStructures
+                    )
+                    
+                    interpretationSection(
+                        mStructures: mStructures,
+                        selectedMeaningPathIndices: $selectedMeaningPathIndices,
+                        expandedPathIndices: $expandedPathIndices
+                    )
+                    topCausesSection(mStructures: mStructures, expandedDiseases: $expandedDiseases)
                 }
                 .padding()
             }
-            .onAppear {
-                //waitingCriteriaQueue = []
-                matchedcCriteria = []
-                matchedcCriteriaPaths = []
-                mStructures = []
-                
-//                meaningToDiseaseDict = Dictionary(uniqueKeysWithValues:
-//                        meaningDict.values.map { meaning in
-//                            (meaning, CMDUtils.meaningToDisease(
-//                                meaning: meaning,
-//                                meaningDict: meaningDict,
-//                                diseaesDict: diseaseDict
-//                            ))
-//                        }
-//                    )
-                
-                //initializeQueue()
-                //matchingCCriteria()
-                backtrackAllCCriteriaPaths()
-                mStructures = makeMeaningPaths()
-            }
-            .navigationTitle("Analysis Result")
+//            .onAppear {
+//                //waitingCriteriaQueue = []
+//                matchedcCriteria = []
+//                matchedcCriteriaPaths = []
+//                mStructures = []
+//                backtrackAllCCriteriaPaths()
+//                mStructures = makeMeaningPaths()
 //            }
+            .navigationTitle("Analysis Result")
         }
     }
     
     // MARK: - Sections
     // 1. Electrolyte
-    private var selectedElectrolytesHeader: some View { // 전해질 순서 첫 화면이랑 맞추기
+    private func selectedElectrolytesHeader(
+        matchedcCriteria: [CCriteria],
+        matchedcCriteriaPaths: [[CCriteria]],
+        mStructures: [[meaningWithTailC]]
+    ) -> some View { // 전해질 순서 첫 화면이랑 맞추기
         HStack(spacing: 6) {
             ForEach(Electrolyte.displayOrder.filter { data.selectedElectrolytes.contains($0)}, id: \.self) { electrolyte in
                     ElectrolyteCircleView(electrolyte: electrolyte)
@@ -149,61 +172,36 @@ struct ResultViewNew: View {
                     .background(Color.customLightGreen.opacity(0.3))
                     .foregroundColor(.customGreen)
                     .overlay(
-                            RoundedRectangle(cornerRadius: 5)
-                                .stroke(Color.customGreen, lineWidth: 1) // ✅ 테두리 추가
-                        )
+                        RoundedRectangle(cornerRadius: 5)
+                            .stroke(Color.customGreen, lineWidth: 1) // ✅ 테두리 추가
+                    )
                     .cornerRadius(5)
             }
         }
         .padding(.leading, 4)
     }
     
-//    // 2. Lab data
-//    private var labDataSection: some View {
-//        VStack(alignment: .leading, spacing: 12) {
-//            Text("Lab Data").font(.title3).bold()
-//
-//
-//            HStack(alignment: .top) {
-//                VStack(alignment: .leading, spacing: 6) {
-//                    labItemView(.pNa)
-//                    labItemView(.pK)
-//                }
-//
-//                Spacer(minLength: 16)
-//
-//                Rectangle()
-//                    .fill(Color.gray.opacity(0.4))
-//                    .frame(width: 1, height: 40)
-//
-//                Spacer(minLength: 16)
-//
-//                VStack(alignment: .leading, spacing: 6) {
-//                    labItemView(.uNa)
-//                    labItemView(.uK)
-//                }
-//                .padding(.trailing, 20)
-//            }
-//        }
-//    }
-    
-    // 3. Interpretation
+    // 2. Interpretation
     @State private var expandedPathIndices: Set<Int> = []
     @State private var selectedMeaningPathIndices: Set<Int> = []
-    private var interpretationSection: some View {
+    private func interpretationSection(
+        mStructures: [[meaningWithTailC]],
+        selectedMeaningPathIndices: Binding<Set<Int>>,
+        expandedPathIndices: Binding<Set<Int>>
+    ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionHeader("Interpretation")
 
             ForEach(Array(mStructures.enumerated()), id: \.offset) { index, path in
                 HStack(alignment: .center) {
                     Button(action: {
-                        if expandedPathIndices.contains(index) {
-                            expandedPathIndices.remove(index)
+                        if expandedPathIndices.wrappedValue.contains(index) {
+                            expandedPathIndices.wrappedValue.remove(index)
                         } else {
-                            expandedPathIndices.insert(index)
+                            expandedPathIndices.wrappedValue.insert(index)
                         }
                     }) {
-                        Image(systemName: expandedPathIndices.contains(index) ? "chevron.down" : "chevron.right")
+                        Image(systemName: expandedPathIndices.wrappedValue.contains(index) ? "chevron.down" : "chevron.right")
                             .foregroundColor(.customGray)
                             .padding(.trailing, 4)
                             .frame(width: 20, height: 44)
@@ -223,15 +221,10 @@ struct ResultViewNew: View {
                                 selectedMeaningPathIndices: $selectedMeaningPathIndices,
                                 expandedPathIndices: $expandedPathIndices
                             )
-//                            .padding(.vertical, 12)
-//                            .padding(.horizontal, 12)
-//                            .frame(minHeight: 44)
-//                            .frame(maxWidth: .infinity)
-//                            .contentShape(Rectangle())
 
                         }
                         
-                        if expandedPathIndices.contains(index) {
+                        if expandedPathIndices.wrappedValue.contains(index) {
                             InterpretationDetail(path: path)
                                 .padding(.horizontal, 12)
                                 .padding(.bottom, 8)
@@ -239,12 +232,12 @@ struct ResultViewNew: View {
                     }
                     .background(
                         ZStack {
-                            if selectedMeaningPathIndices.contains(index) {
+                            if selectedMeaningPathIndices.wrappedValue.contains(index) {
                                 RoundedRectangle(cornerRadius: 12)
                                     .fill(Color.customWhite.opacity(0.2)) // ✅ 내부 색상 추가
                             }
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(selectedMeaningPathIndices.contains(index) ? Color.customGreen : Color.customGray, lineWidth: 1)
+                                .stroke(selectedMeaningPathIndices.wrappedValue.contains(index) ? Color.customGreen : Color.customGray, lineWidth: 1)
                         }
                     )
                 }
@@ -252,11 +245,12 @@ struct ResultViewNew: View {
         }
     }
     
-    
-    
     // 4. Top causes
     @State private var expandedDiseases: Set<Int> = []
-    private var topCausesSection: some View {
+    private func topCausesSection(
+        mStructures: [[meaningWithTailC]],
+        expandedDiseases: Binding<Set<Int>>
+    ) -> some View {
         
         VStack(alignment: .leading, spacing: 8) {
             sectionHeader("Possible Causes")
@@ -273,7 +267,7 @@ struct ResultViewNew: View {
                     ForEach(Array(inferredDiseases.enumerated()), id: \.offset) { index, card in
                         VStack(alignment: .leading, spacing: 4) {
                             TopCauseRow(card: card, index: index, expandedIndices: $expandedDiseases)
-                            if expandedDiseases.contains(index) {
+                            if expandedDiseases.wrappedValue.contains(index) {
                                 TopCauseDetailWithDots(card: card, diseaseRoute: diseaseRoute, meaningDict: meaningDict, diseaseDict: diseaseDict)
                             }
                         }
@@ -306,149 +300,122 @@ struct ResultViewNew: View {
     }
     
     // MARK: - Data processing
-//    // cStructures 만들기
-//    func initializeQueue(){
-//        // ContentView에서 선택한 전해질과 관련된 rootCriteria만
-//        let relatedRootCriterias = rootCriteriaList.filter{data.selectedElectrolytes.contains($0.electrolyte)}
-//        //print("Related root criterias: \(relatedRootCriterias)")
-//        for rootCriteria in relatedRootCriterias { // relatedRootCriteria 중에서도 만족하는 것만 큐에 넣기
-//            if cCriteriaCalculationManager.evaluatecCriteria(labValues: data.labValues, parameter: rootCriteria.para, threshold: rootCriteria.thres, direction: rootCriteria.direction) {
-//                self.matchedcCriteria.append(rootCriteria)
-//                self.waitingCriteriaQueue.append((current: rootCriteria, path: [rootCriteria]))
+//    //cStructures 만들기 - 백트래킹
+//    func backtrackAllCCriteriaPaths() {
+//        matchedcCriteria = []
+//        matchedcCriteriaPaths = []
+//
+//        let relatedRootCriterias = rootCriteriaList.filter { data.selectedElectrolytes.contains($0.electrolyte) }
+//
+//        for root in relatedRootCriterias {
+//            if cCriteriaCalculationManager.evaluatecCriteria(labValues: data.labValues, parameter: root.para, threshold: root.thres, direction: root.direction){
+//                matchedcCriteria.append(root)
+//                if root.meaningID.isEmpty {
+//                    dfs(current: root, path: [], temp: [root])
+//                } else {
+//                    dfs(current: root, path: [root], temp: [])
+//                }
 //            }
 //        }
-//        //print("🧩 Root CCriteria IDs: \(relatedRootCriterias)")
+//
+//        print("🧩 DFS matchedCriteriaPaths: \(matchedcCriteriaPaths.count)")
+//    }
+//
+//    func dfs(current: CCriteria, path: [CCriteria], temp: [CCriteria]) -> Bool{
+//
+//        let tailCriterias = current.tailCID.compactMap { cCriteriaDict[$0] }
+//
+//        var hasValidChild = false
+//        for next in tailCriterias {
+//            if cCriteriaCalculationManager.evaluatecCriteria(
+//                labValues: data.labValues,
+//                parameter: next.para,
+//                threshold: next.thres,
+//                direction: next.direction
+//            ) {
+//                matchedcCriteria.append(next)
+//                if next.meaningID.isEmpty {
+//                    hasValidChild = hasValidChild || dfs(current: next, path: path, temp: temp + [next])
+//                } else {
+//                    hasValidChild = true
+//                    dfs(current: next, path: path + temp + [next], temp: [])
+//                }
+//            }
+//        }
+//
+//        // 끝에 meaningID가 있고, 더 이상 유효한 child가 없을 때만 저장
+//        if !hasValidChild && !current.meaningID.isEmpty {
+//            matchedcCriteriaPaths.append(path)
+//        }
+//        
+//        return hasValidChild
 //    }
 //    
-//    func matchingCCriteria() { //waitingCriteriaQueue에는 이미 true가 입증된 것들만 들어있음
-//        while !waitingCriteriaQueue.isEmpty {
-//            let (currentCriteria, path) = waitingCriteriaQueue.removeFirst()
-//            
-//            var isLeaf = true
-//            let nextIDs = currentCriteria.tailCID
-//            let tailCriterias = nextIDs.compactMap { cCriteriaDict[$0] }
-//            for tailCriteria in tailCriterias {
-//                if cCriteriaCalculationManager.evaluatecCriteria(labValues: data.labValues, parameter: tailCriteria.para, threshold: tailCriteria.thres, direction: tailCriteria.direction) {
-//                    matchedcCriteria.append(tailCriteria)
-//                    waitingCriteriaQueue.append((current: tailCriteria, path: path + [tailCriteria]))
-//                    isLeaf = false
+//    
+//    // mStructures 만들기
+//    func makeMeaningPaths() ->  [[meaningWithTailC]] {
+//        var totalmeaningPaths: [[meaningWithTailC]] = []
+//        for cStructure in matchedcCriteriaPaths {
+//            var priorPaths: [[meaningWithTailC]] = []
+//            var currentPaths: [[meaningWithTailC]] = []
+//            var prev: Int = -1
+//            var cur: Int = 0
+//            let endIndex = cStructure.count
+//            while cur < endIndex {
+//                let c = cStructure[cur]
+//                let tailCs = Array(cStructure[prev+1...cur])
+//                
+//                if c.meaningID.count == 0 {
+//                    cur += 1
+//                    continue
 //                }
-//            }
-//            
-//            if isLeaf {
-//                if currentCriteria.meaningID.count != 0{
-//                    matchedcCriteriaPaths.append(path)
+//                
+//                for mID in c.meaningID {
+//                    guard let m = meaningDict[mID] else {continue}
+//                    let mComplex = meaningWithTailC(m: m, tailC: tailCs)
+//                    
+//                    var isRoot = true
+//                    for existingPath in priorPaths {
+//                        guard let leafM = existingPath.last else {continue}
+//                        if leafM.m.tailMID.contains(mID) {
+//                            currentPaths.append(existingPath + [mComplex])
+//                            isRoot = false
+//                        } else {
+//                            currentPaths.append(existingPath)
+//                        }
+//                    }
+//                    if isRoot {
+//                        currentPaths.append([mComplex])
+//                    }
 //                }
+//                
+//                priorPaths = currentPaths
+//                currentPaths = []
+//                prev = cur
+//                cur += 1
 //            }
+//        totalmeaningPaths += priorPaths
 //        }
-//        //print("🧩 matchedCriterias:: \(matchedcCriteria)")
-//        print("🧩 matchedCriteriaPaths: \(matchedcCriteriaPaths)")
-//        print("🧩 matchedCriteriaPaths: \(matchedcCriteriaPaths.count)")
+//        print("🍃mStructures: \(totalmeaningPaths)")
+//    return totalmeaningPaths
 //    }
-    
-    //cStructures 만들기 - 백트래킹
-    func backtrackAllCCriteriaPaths() {
-        matchedcCriteria = []
-        matchedcCriteriaPaths = []
-
-        let relatedRootCriterias = rootCriteriaList.filter { data.selectedElectrolytes.contains($0.electrolyte) }
-
-        for root in relatedRootCriterias {
-            if cCriteriaCalculationManager.evaluatecCriteria(labValues: data.labValues, parameter: root.para, threshold: root.thres, direction: root.direction){
-                matchedcCriteria.append(root)
-                if root.meaningID.isEmpty {
-                    dfs(current: root, path: [], temp: [root])
-                } else {
-                    dfs(current: root, path: [root], temp: [])
-                }
-            }
-        }
-
-        print("🧩 DFS matchedCriteriaPaths: \(matchedcCriteriaPaths.count)")
-    }
-
-    func dfs(current: CCriteria, path: [CCriteria], temp: [CCriteria]) -> Bool{
-
-        let tailCriterias = current.tailCID.compactMap { cCriteriaDict[$0] }
-
-        var hasValidChild = false
-        for next in tailCriterias {
-            if cCriteriaCalculationManager.evaluatecCriteria(
-                labValues: data.labValues,
-                parameter: next.para,
-                threshold: next.thres,
-                direction: next.direction
-            ) {
-                matchedcCriteria.append(next)
-                if next.meaningID.isEmpty {
-                    hasValidChild = hasValidChild || dfs(current: next, path: path, temp: temp + [next])
-                } else {
-                    hasValidChild = true
-                    dfs(current: next, path: path + temp + [next], temp: [])
-                }
-            }
-        }
-
-        // 끝에 meaningID가 있고, 더 이상 유효한 child가 없을 때만 저장
-        if !hasValidChild && !current.meaningID.isEmpty {
-            matchedcCriteriaPaths.append(path)
-        }
-        
-        return hasValidChild
-    }
-    
-    
-    // mStructures 만들기
-    func makeMeaningPaths() ->  [[meaningWithTailC]] {
-        var totalmeaningPaths: [[meaningWithTailC]] = []
-        for cStructure in matchedcCriteriaPaths {
-            var priorPaths: [[meaningWithTailC]] = []
-            var currentPaths: [[meaningWithTailC]] = []
-            var prev: Int = -1
-            var cur: Int = 0
-            let endIndex = cStructure.count
-            while cur < endIndex {
-                let c = cStructure[cur]
-                let tailCs = Array(cStructure[prev+1...cur])
-                
-                if c.meaningID.count == 0 {
-                    cur += 1
-                    continue
-                }
-                
-                for mID in c.meaningID {
-                    guard let m = meaningDict[mID] else {continue}
-                    let mComplex = meaningWithTailC(m: m, tailC: tailCs)
-                    
-                    var isRoot = true
-                    for existingPath in priorPaths {
-                        guard let leafM = existingPath.last else {continue}
-                        if leafM.m.tailMID.contains(mID) {
-                            currentPaths.append(existingPath + [mComplex])
-                            isRoot = false
-                        } else {
-                            currentPaths.append(existingPath)
-                        }
-                    }
-                    if isRoot {
-                        currentPaths.append([mComplex])
-                    }
-                }
-                
-                priorPaths = currentPaths
-                currentPaths = []
-                prev = cur
-                cur += 1
-            }
-        totalmeaningPaths += priorPaths
-        }
-        print("🍃mStructures: \(totalmeaningPaths)")
-    return totalmeaningPaths
-    }
     
     
     // mStructures 기반으로 disease 추리고 나열
     func multiPathSelection(paths: [[Meaning]]) -> [causeCard] {
+        
+//        // 1. Meaning 등장 횟수 계산
+//        var meaningCount: [Meaning: Int] = [:]
+//        for path in paths {
+//            for m in path {
+//                meaningCount[m, default: 0] += 1
+//        }
+//
+//        // 2. 등장 횟수가 1인 Meaning만 남기기
+//        let filteredPaths = paths.map { path in
+//            path.filter { meaningCount[$0] == 1 }
+//        }
+
         
         // m 조합 순서 정하기
         var finalComplexes: [[Meaning]] = []
@@ -551,19 +518,6 @@ struct InterpretationRow: View {
 
     var body: some View {
         HStack(spacing: 8) {
-//            Button(action: {
-//                if expandedPathIndices.contains(index) {
-//                    expandedPathIndices.remove(index)
-//                } else {
-//                    expandedPathIndices.insert(index)
-//                }
-//            }) {
-//                Image(systemName: expandedPathIndices.contains(index) ? "chevron.down" : "chevron.right")
-//                    .foregroundColor(.gray)
-//                    .padding(.trailing, 4)
-//                    .frame(width: 20)
-//            }
-            
             Button(action: {
                 if selectedMeaningPathIndices.contains(index) {
                     selectedMeaningPathIndices.remove(index)
@@ -583,21 +537,8 @@ struct InterpretationRow: View {
                 .frame(minHeight: 44)
                 .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
-                //.padding()
-//                .background(
-//                    RoundedRectangle(cornerRadius: 12)
-//                        .stroke(selectedMeaningPathIndices.contains(index) ? Color.blue : Color.gray)
-//                )
             }
             .buttonStyle(PlainButtonStyle())
-
-            //        .simultaneousGesture(TapGesture().onEnded {
-            //            if expandedPathIndices.contains(index) {
-            //                expandedPathIndices.remove(index)
-            //            } else {
-            //                expandedPathIndices.insert(index)
-            //            }
-            //        })
         }
     }
 }
@@ -678,35 +619,6 @@ struct TopCauseRow: View {
         }
     }
 }
-
-//struct TopCauseDetail: View {
-//    let card: causeCard
-//    let diseaseRoute: [Disease: [[String]]]
-//    let meaningDict: [Int: Meaning]
-//    let diseaseDict: [Int: Disease]
-//
-//    var body: some View {
-//        let routes = diseaseRoute[card.disease] ?? []
-//        VStack(alignment: .leading, spacing: 2) {
-//            ForEach(routes, id: \.self) { route in
-//                let pathSet = Set(card.paths.flatMap { $0 }.map { "M\($0.id)" })
-//                let routeText = route.compactMap { idString -> Text? in
-//                    if idString.starts(with: "M"), let id = Int(idString.dropFirst()), let meaning = meaningDict[id] {
-//                        let text = Text(meaning.name)
-//                        return pathSet.contains("M\(id)") ? text.bold() : text
-//                    } else if idString.starts(with: "D"), let id = Int(idString.dropFirst()), let disease = diseaseDict[id] {
-//                        return Text(disease.name)
-//                    } else {
-//                        return nil
-//                    }
-//                }
-//                routeText.reduce(Text(""), { $0 + Text(" > ") + $1 })
-//                    .font(.caption2)
-//                    .foregroundColor(.gray)
-//            }
-//        }
-//    }
-//}
 
 struct TopCauseDetailWithDots: View {
     let card: causeCard

@@ -304,7 +304,8 @@ struct CMDUtils {
         return diseaseRouteDict
     }
     
-    // Meaning에 root Meaning등 (headID가 없는)을 넣어서 full meaning route 반환
+    // "diseaseRoute": Disease의 route를 전부 저장하는 딕셔너리 만들기
+    // Meaning에 root Meaning(headID가 없는)을 넣어서 각 Disease들 full meaning route 반환. BFS 사용.
     static func diseaseToFullMeaningRoute(
         meaning: Meaning,
         meaningDict: [Int: Meaning],
@@ -328,6 +329,51 @@ struct CMDUtils {
         
         return diseaseRouteDict
     }
+    
+//    enum RouteID: Hashable, CustomStringConvertible {
+//        case meaning(Int)
+//        case disease(Int)
+//        
+//        var description: String {
+//            switch self {
+//            case .meaning(let id): return "M\(id)"
+//            case .disease(let id): return "D\(id)"
+//            }
+//        }
+//    }
+    
+    //Disease의 route를 전부 저장하는 딕셔너리
+    static func buildDiseaseRoute(
+            meaningDict: [Int: Meaning],
+            diseaseDict: [Int: Disease]
+    ) -> [Disease: [[String]]] {
+        var result: [Disease: [[String]] ] = [:]
+        let rootMeanings = MeaningStore.shared.rootMeanings
+        let routeDict = rootMeanings
+            .map { CMDUtils.diseaseToFullMeaningRoute(meaning: $0, meaningDict: meaningDict, diseaesDict: diseaseDict) }
+            .reduce(into: [Disease: [[Meaning]]]() ) { result, dict in
+                for (disease, routes) in dict {
+                    result[disease, default: []] += routes
+                }
+            }
+        for (disease, routes) in routeDict {
+            for route in routes{
+                var routeIDs: [String] = route.map { "M"+String($0.id) }
+                
+                // Disease head 넣기. D계층은 최대 한 층이어야 함. ... > M > D > D 이어야 함 (D > D > D X)
+                if let leafM = route.last {
+                    for headID in disease.resultDID {
+                        if leafM.diseaseID.contains(headID) {
+                            routeIDs.append("D"+String(headID))
+                        }
+                    }
+                }
+                result[disease, default: []].append(routeIDs)
+            }
+        }
+        return result
+    }
+    
     
     static func CCriteriaRouteToString (criteriaPath: [CCriteria]) -> String {
         var criteriaStrs: [String] = []
