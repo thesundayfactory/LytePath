@@ -598,7 +598,7 @@ struct TopCauseRow: View {
                         .bold()
                     if !card.disease.relatedDID.isEmpty {
                         let relatedNames = card.disease.relatedDID.compactMap { diseaseDict[$0]?.name }
-                        Text("Related: \(relatedNames.joined(separator: ", "))")
+                        Text("Mechanism overlap: \(relatedNames.joined(separator: ", "))")
                             .font(.caption2)
                             .foregroundColor(.customGray)
                     }
@@ -813,7 +813,7 @@ struct singlePathTreeView: View {
                             if let disease = node.disease {
                                 if !disease.relatedDID.isEmpty {
                                     let relatedNames = disease.relatedDID.compactMap({diseaseDict[$0]?.name})
-                                    Text("Related: \(relatedNames.joined(separator: ", "))")
+                                    Text("Mechanism overlap: \(relatedNames.joined(separator: ", "))")
                                         .font(.caption2)
                                         .foregroundColor(.customGray)
                                 }

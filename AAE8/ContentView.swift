@@ -132,7 +132,7 @@ struct ContentView: View {
     private var titleBar: some View {
         
         HStack {
-            Image("LytePathLogo_old") // <- Add your image asset to Assets.xcassets
+            Image("LytePathLogo") // <- Add your image asset to Assets.xcassets
                 .resizable()
                 .scaledToFit()
                 .frame(width: 50, height: 50)

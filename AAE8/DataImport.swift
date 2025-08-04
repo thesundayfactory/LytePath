@@ -285,7 +285,7 @@ class MeaningStore {
                     return $0.order < $1.order
                 }
         }
-        return rootMeanings
+        return sortedRootMeanings
     }
     
     var mDRelation: [HeadTailRelation] {

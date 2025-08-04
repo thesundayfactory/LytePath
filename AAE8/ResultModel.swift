@@ -200,7 +200,7 @@ struct ResultLogic {
         // 4. finalComplex의 path화
         var causeCards: [causeCard] = []
         for (disease, meaningComplex) in diseaseAndFinalMComplex {
-            let diseasePaths = meaningCompexToMeaningPath(meaningComplex: meaningComplex, paths: paths)
+            let diseasePaths = meaningComplexToMeaningPath(meaningComplex: meaningComplex, paths: paths)
             causeCards.append(causeCard(disease: disease, paths: diseasePaths))
         }
         
@@ -220,7 +220,7 @@ struct ResultLogic {
         return Array(commonDiseases)
     }
     
-    private static func meaningCompexToMeaningPath(meaningComplex: [Meaning], paths: [[Meaning]]) -> [[Meaning]] {
+    private static func meaningComplexToMeaningPath(meaningComplex: [Meaning], paths: [[Meaning]]) -> [[Meaning]] {
         var result: [[Meaning]] = []
         
         let totalPathNumber = paths.count

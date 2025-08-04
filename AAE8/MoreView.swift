@@ -134,7 +134,7 @@ struct InterpretationNode: Identifiable {
     let children: [InterpretationNode]
     let isCase: Bool
     var criteriaPath: String?
-    var otherCriteriaPath: String = ""
+    //var otherCriteriaPath: String = ""
     //var description: String?
 }
 
@@ -165,45 +165,45 @@ func meaningToInterpretationNode(
         .joined(separator: "\n")
     
     
-    // 2. OtherPath (Lab logic)
-    var criteriaOtherPaths:[[CCriteria]] = []
-    if let rootCIDs = criteriaIDDictByMeaningID[meaning.id]?.compactMap({$0.headID}){
-        for rootCID in rootCIDs {
-            let otherPaths = CMDUtils.criteriaAscendingPath(criteriaID: rootCID, headCIDDictByTailCID: headCIDDictByTailCID)
-                .map { path in
-                    path.compactMap { cCriteriaDict[$0] }
-                }
-            criteriaOtherPaths += otherPaths
-        }
-    }
-    // 정렬
-    let sortedOtherPaths = criteriaOtherPaths.sorted { path1, path2 in
-        for (c1, c2) in zip(path1, path2) {
-            if c1.order != c2.order {
-                return c1.order < c2.order
-            }
-        }
-        return path1.count < path2.count // 길이로 tie-break
-    }
+//    // 2. OtherPath (Lab logic)
+//    var criteriaOtherPaths:[[CCriteria]] = []
+//    if let rootCIDs = criteriaIDDictByMeaningID[meaning.id]?.compactMap({$0.headID}){
+//        for rootCID in rootCIDs {
+//            let otherPaths = CMDUtils.criteriaAscendingPath(criteriaID: rootCID, headCIDDictByTailCID: headCIDDictByTailCID)
+//                .map { path in
+//                    path.compactMap { cCriteriaDict[$0] }
+//                }
+//            criteriaOtherPaths += otherPaths
+//        }
+//    }
+//    // 정렬
+//    let sortedOtherPaths = criteriaOtherPaths.sorted { path1, path2 in
+//        for (c1, c2) in zip(path1, path2) {
+//            if c1.order != c2.order {
+//                return c1.order < c2.order
+//            }
+//        }
+//        return path1.count < path2.count // 길이로 tie-break
+//    }
+//    
+//    var criteriaOtherPathsStr: [String] = []
+//    for otherPath in sortedOtherPaths {
+//        let pathStr = CMDUtils.CCriteriaRouteToString(criteriaPath: otherPath)
+////                    let pathStr = otherPath.compactMap { cCriteriaDict[$0] }.map { crit in
+////                        let dir = crit.direction == .high ? "↑" : "↓"
+////                        return "\(crit.para.displayName) \(String(format: "%.2f", crit.thres)) \(dir)"
+////                    }.joined(separator: " & ")
+//        if criteriaPaths.contains(pathStr) {continue}
+//        criteriaOtherPathsStr.append(pathStr)
+//                    //otherCriteriaPath += "\n" + "• " + pathStr
+//    }
+//
+//    let otherCriteriaPathStr = criteriaOtherPathsStr
+//        .map { "• " + $0 }
+//        .joined(separator: "\n")
     
-    var criteriaOtherPathsStr: [String] = []
-    for otherPath in sortedOtherPaths {
-        let pathStr = CMDUtils.CCriteriaRouteToString(criteriaPath: otherPath)
-//                    let pathStr = otherPath.compactMap { cCriteriaDict[$0] }.map { crit in
-//                        let dir = crit.direction == .high ? "↑" : "↓"
-//                        return "\(crit.para.displayName) \(String(format: "%.2f", crit.thres)) \(dir)"
-//                    }.joined(separator: " & ")
-        if criteriaPaths.contains(pathStr) {continue}
-        criteriaOtherPathsStr.append(pathStr)
-                    //otherCriteriaPath += "\n" + "• " + pathStr
-    }
-
-    let otherCriteriaPathStr = criteriaOtherPathsStr
-        .map { "• " + $0 }
-        .joined(separator: "\n")
     
-    
-    //childrenList 만들기
+    // 2. childrenList 만들기
     var childrenList: [InterpretationNode] = []
     // 3. children 중 Disease 타입
     let isLeafMeaning = caseLeafM.contains(meaning)
@@ -231,7 +231,7 @@ func meaningToInterpretationNode(
         childrenList.append(meaningToInterpretationNode(meaning: m,path: path + [m], caseM: caseM, caseLeafM: caseLeafM, casePath: casePath))
     }
     
-    return InterpretationNode(type: .Meaning, path: path, meaning: meaning, disease: nil, children: childrenList, isCase: isCase, criteriaPath: criteriaPathsStr, otherCriteriaPath: otherCriteriaPathStr)
+    return InterpretationNode(type: .Meaning, path: path, meaning: meaning, disease: nil, children: childrenList, isCase: isCase, criteriaPath: criteriaPathsStr)
 //    return InterpretationNode(title: title, children: childrenList, isCase: isCase, labCriteriaPath: labCriteriaPath)
 }
 
@@ -351,7 +351,7 @@ struct InterpretationTreeView: View {
                     if let disease = node.disease {
                         if !disease.relatedDID.isEmpty{
                             let relatedDiseasesName = disease.relatedDID.compactMap({diseaseDict[$0]?.name})
-                            Text("Related: \(relatedDiseasesName.joined(separator:", "))")
+                            Text("Mechanism overlap: \(relatedDiseasesName.joined(separator:", "))")
                                 .font(.caption2)
                                 .foregroundColor(.customGray)
                         }
@@ -363,12 +363,12 @@ struct InterpretationTreeView: View {
                             .multilineTextAlignment(.leading)
                     }
                     
-                    if showFullLogic {
-                        Text(node.otherCriteriaPath)
-                            .font(.caption2)
-                            .foregroundColor(.customGray)
-                            .multilineTextAlignment(.leading)
-                    }
+//                    if showFullLogic {
+//                        Text(node.otherCriteriaPath)
+//                            .font(.caption2)
+//                            .foregroundColor(.customGray)
+//                            .multilineTextAlignment(.leading)
+//                    }
                     
                     if isExpandedDetail{
                         if node.type == .Disease{

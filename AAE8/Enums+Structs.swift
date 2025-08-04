@@ -290,7 +290,7 @@ extension Array where Element == String {
 }
 
 extension LabItem {
-    var validRange: ClosedRange<Double>? { // 미완성
+    var validRange: ClosedRange<Double>? {
         switch self {
         case .urineOutput: return 50...10000
         case .pNa: return 70...200

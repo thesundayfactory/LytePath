@@ -224,27 +224,27 @@ struct CMDUtils {
         return result
     }
     
-    static func criteriaAscendingPath(
-        criteriaID: Int,
-        headCIDDictByTailCID: [Int: [HeadTailRelation]]
-    ) -> [[Int]] {
-        var paths: [[Int]] = []
-
-        func dfs(current: Int, path: [Int]) {
-            // Base case: no parent → reached root
-            guard let heads = headCIDDictByTailCID[current] else {
-                paths.append(path)
-                return
-            }
-
-            for relation in heads {
-                dfs(current: relation.headID, path: [relation.headID] + path)
-            }
-        }
-
-        dfs(current: criteriaID, path: [criteriaID])
-        return paths
-    }
+//    static func criteriaAscendingPath(
+//        criteriaID: Int,
+//        headCIDDictByTailCID: [Int: [HeadTailRelation]]
+//    ) -> [[Int]] {
+//        var paths: [[Int]] = []
+//
+//        func dfs(current: Int, path: [Int]) {
+//            // Base case: no parent → reached root
+//            guard let heads = headCIDDictByTailCID[current] else {
+//                paths.append(path)
+//                return
+//            }
+//
+//            for relation in heads {
+//                dfs(current: relation.headID, path: [relation.headID] + path)
+//            }
+//        }
+//
+//        dfs(current: criteriaID, path: [criteriaID])
+//        return paths
+//    }
     
     static func meaningToTailEndMeaning(meaning: Meaning, meaningDict: [Int: Meaning]) -> [Meaning] {
         var queue = [meaning]
@@ -274,35 +274,35 @@ struct CMDUtils {
         return Array(Set(diseases))
     }
     
-    // 가장 끄트머리의 cCriteria의 meaning 부터 ~ disease 직전 meaning까지
-    // M(cCriteria) -> M(mechanism) -> M(mechanism) ->  M(mechanism) -> ...
-    static func diseaseToMinimumMeaningRoute(
-        meaning: Meaning,
-        meaningDict: [Int: Meaning],
-        diseaesDict: [Int: Disease]
-    ) -> [Disease: [[Meaning]] ] {
-        var queue: [(current: Meaning, path: [Meaning])] = []
-        queue.append((current: meaning, path: [meaning]))
-        var diseaseRouteDict: [Disease: [[Meaning]] ] = [:]
-        
-        while !queue.isEmpty {
-            let (currentMeaning, path) = queue.removeFirst()
-            let diseases = currentMeaning.diseaseID.compactMap{diseaseDict[$0]}
-            for d in diseases {
-                diseaseRouteDict[d, default: []].append(path)
-            }
-            let tailMeanings = currentMeaning.tailMID.compactMap{meaningDict[$0]}
-            for m in tailMeanings {
-                if m.category == .cCriteria { // m 이 ccriteria 타입이면 새로 시작 (여태까지 path는 버리고)
-                    queue.append((current: m, path: [m]))
-                } else {
-                    queue.append((current: m, path: path + [m]))
-                }
-            }
-        }
-        
-        return diseaseRouteDict
-    }
+//    // 가장 끄트머리의 cCriteria의 meaning 부터 ~ disease 직전 meaning까지
+//    // M(cCriteria) -> M(mechanism) -> M(mechanism) ->  M(mechanism) -> ...
+//    static func diseaseToMinimumMeaningRoute(
+//        meaning: Meaning,
+//        meaningDict: [Int: Meaning],
+//        diseaesDict: [Int: Disease]
+//    ) -> [Disease: [[Meaning]] ] {
+//        var queue: [(current: Meaning, path: [Meaning])] = []
+//        queue.append((current: meaning, path: [meaning]))
+//        var diseaseRouteDict: [Disease: [[Meaning]] ] = [:]
+//        
+//        while !queue.isEmpty {
+//            let (currentMeaning, path) = queue.removeFirst()
+//            let diseases = currentMeaning.diseaseID.compactMap{diseaseDict[$0]}
+//            for d in diseases {
+//                diseaseRouteDict[d, default: []].append(path)
+//            }
+//            let tailMeanings = currentMeaning.tailMID.compactMap{meaningDict[$0]}
+//            for m in tailMeanings {
+//                if m.category == .cCriteria { // m 이 ccriteria 타입이면 새로 시작 (여태까지 path는 버리고)
+//                    queue.append((current: m, path: [m]))
+//                } else {
+//                    queue.append((current: m, path: path + [m]))
+//                }
+//            }
+//        }
+//        
+//        return diseaseRouteDict
+//    }
     
     // "diseaseRoute": Disease의 route를 전부 저장하는 딕셔너리 만들기
     // Meaning에 root Meaning(headID가 없는)을 넣어서 각 Disease들 full meaning route 반환. BFS 사용.
