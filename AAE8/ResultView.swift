@@ -258,7 +258,7 @@ struct ResultViewNew: View {
                 mStructures[index].map({$0.m})
             }
             if selectedPaths.count >= 2 {
-                let inferredDiseases = multiPathSelection(paths: selectedPaths).filter{$0.disease.typical == true}
+                let inferredDiseases = ResultLogic.multiPathSelection(paths: selectedPaths, meaningToDisease: meaningToDisease).filter{$0.disease.typical == true}
                 if inferredDiseases.isEmpty {
                     Text("No disease matched all selected meanings.")
                         .font(.caption)
@@ -401,112 +401,113 @@ struct ResultViewNew: View {
 //    }
     
     
-    // mStructures 기반으로 disease 추리고 나열
-    func multiPathSelection(paths: [[Meaning]]) -> [causeCard] {
-        
+//    // mStructures 기반으로 disease 추리고 나열
+//    func multiPathSelection(paths: [[Meaning]]) -> [causeCard] {
+//        
 //        // 1. Meaning 등장 횟수 계산
 //        var meaningCount: [Meaning: Int] = [:]
 //        for path in paths {
 //            for m in path {
 //                meaningCount[m, default: 0] += 1
+//            }
 //        }
 //
 //        // 2. 등장 횟수가 1인 Meaning만 남기기
 //        let filteredPaths = paths.map { path in
 //            path.filter { meaningCount[$0] == 1 }
 //        }
-
-        
-        // m 조합 순서 정하기
-        var finalComplexes: [[Meaning]] = []
-        var complexInProcess: [Meaning] = []
-        func dfs(i: Int) {
-            if i >= paths.count {
-                finalComplexes.append(complexInProcess)
-                return
-            }
-            var path = paths[i]
-            while !path.isEmpty {
-                let m = path.removeLast()
-                complexInProcess.append(m)
-                dfs(i: i+1)
-                complexInProcess.removeLast()
-            }
-        }
-        dfs(i: 0)
-        print("🍃\(finalComplexes)")
-        
-        // 가장 작은 범위 조합부터 해당되는 diseases 들 배치
-        var result: [Disease] = []
-        var diseaseAndFinalComplex: [(Disease, [Meaning])] = []
-        guard let mostBroadComplex = finalComplexes.last else {return []}
-        var wholeDiseases = diseasesSatisfyingAllMeanings(meanings: mostBroadComplex)
-        for finalComplex in finalComplexes {
-            for d in diseasesSatisfyingAllMeanings(meanings: finalComplex).sorted(by: { $0.id < $1.id }) { //귀찮아. 순서가 유지만 되면 되니까 걍 id 순 나열.
-                if wholeDiseases.contains(d) {
-                    result.append(d)
-                    diseaseAndFinalComplex.append((d, finalComplex))
-                    wholeDiseases.removeAll { $0.id == d.id }
-                }
-            }
-        }
-        
-        // finalComplex의 path화
-        var causeCards: [causeCard] = []
-        for (disease, meaningComplex) in diseaseAndFinalComplex {
-            let diseasePaths = meaningCompexToMeaningPath(meaningComplex: meaningComplex, paths: paths)
-            causeCards.append(causeCard(disease: disease, paths: diseasePaths))
-        }
-        
-        //print("🍃\(result)")
-        return causeCards
-    }
-    
-    func diseasesSatisfyingAllMeanings(meanings: [Meaning]) -> [Disease] {
-        guard !meanings.isEmpty else { return [] }
-
-        // Convert each Meaning to a Set of Disease IDs
-        let diseaseSets: [Set<Disease>] = meanings.map { Set(meaningToDisease[$0] ?? []) }
-
-        // Find intersection of all sets (common diseases)
-        let commonDiseases = diseaseSets.dropFirst().reduce(diseaseSets[0]) { $0.intersection($1) }
-
-        // Return actual Disease objects
-        return Array(commonDiseases)
-    }
-    
-    func meaningCompexToMeaningPath(meaningComplex: [Meaning], paths: [[Meaning]]) -> [[Meaning]] {
-        var result: [[Meaning]] = []
-        
-        let totalPathNumber = paths.count
-        for i in 0...totalPathNumber-1{
-            let path = paths[i]
-            var pathProcessing:[Meaning] = []
-            for m in path { // path 젤 앞에서부터 m 나올 때 끊기
-                pathProcessing.append(m)
-                if m == meaningComplex[i] {
-                    break
-                }
-            }
-            result.append(pathProcessing)
-        }
-        
-        return result
-    }
+//
+//        
+//        // m 조합 순서 정하기
+//        var finalComplexes: [[Meaning]] = []
+//        var complexInProcess: [Meaning] = []
+//        func dfs(i: Int) {
+//            if i >= filteredPaths.count {
+//                finalComplexes.append(complexInProcess)
+//                return
+//            }
+//            var path = filteredPaths[i]
+//            while !path.isEmpty {
+//                let m = path.removeLast()
+//                complexInProcess.append(m)
+//                dfs(i: i+1)
+//                complexInProcess.removeLast()
+//            }
+//        }
+//        dfs(i: 0)
+//        print("🍃\(finalComplexes)")
+//        
+//        // 가장 작은 범위 조합부터 해당되는 diseases 들 배치
+//        var result: [Disease] = []
+//        var diseaseAndFinalComplex: [(Disease, [Meaning])] = []
+//        guard let mostBroadComplex = finalComplexes.last else {return []}
+//        var wholeDiseases = diseasesSatisfyingAllMeanings(meanings: mostBroadComplex)
+//        for finalComplex in finalComplexes {
+//            for d in diseasesSatisfyingAllMeanings(meanings: finalComplex).sorted(by: { $0.id < $1.id }) { //귀찮아. 순서가 유지만 되면 되니까 걍 id 순 나열.
+//                if wholeDiseases.contains(d) {
+//                    result.append(d)
+//                    diseaseAndFinalComplex.append((d, finalComplex))
+//                    wholeDiseases.removeAll { $0.id == d.id }
+//                }
+//            }
+//        }
+//        
+//        // finalComplex의 path화
+//        var causeCards: [causeCard] = []
+//        for (disease, meaningComplex) in diseaseAndFinalComplex {
+//            let diseasePaths = meaningCompexToMeaningPath(meaningComplex: meaningComplex, paths: paths)
+//            causeCards.append(causeCard(disease: disease, paths: diseasePaths))
+//        }
+//        
+//        //print("🍃\(result)")
+//        return causeCards
+//    }
+//    
+//    func diseasesSatisfyingAllMeanings(meanings: [Meaning]) -> [Disease] {
+//        guard !meanings.isEmpty else { return [] }
+//
+//        // Convert each Meaning to a Set of Disease IDs
+//        let diseaseSets: [Set<Disease>] = meanings.map { Set(meaningToDisease[$0] ?? []) }
+//
+//        // Find intersection of all sets (common diseases)
+//        let commonDiseases = diseaseSets.dropFirst().reduce(diseaseSets[0]) { $0.intersection($1) }
+//
+//        // Return actual Disease objects
+//        return Array(commonDiseases)
+//    }
+//    
+//    func meaningCompexToMeaningPath(meaningComplex: [Meaning], paths: [[Meaning]]) -> [[Meaning]] {
+//        var result: [[Meaning]] = []
+//        
+//        let totalPathNumber = paths.count
+//        for i in 0...totalPathNumber-1{
+//            let path = paths[i]
+//            var pathProcessing:[Meaning] = []
+//            for m in path { // path 젤 앞에서부터 m 나올 때 끊기
+//                pathProcessing.append(m)
+//                if m == meaningComplex[i] {
+//                    break
+//                }
+//            }
+//            result.append(pathProcessing)
+//        }
+//        
+//        return result
+//    }
     
 }
 
-struct meaningWithTailC: Hashable {
-    let m: Meaning
-    let tailC: [CCriteria]
-}
+//struct meaningWithTailC: Hashable {
+//    let m: Meaning
+//    let tailC: [CCriteria]
+//}
 
-struct causeCard: Identifiable {
-    let disease: Disease
-    let paths: [[Meaning]]
-    
-    var id: Int { disease.id }
-}
+//struct causeCard: Identifiable {
+//    let disease: Disease
+//    let paths: [[Meaning]]
+//    
+//    var id: Int { disease.id }
+//}
 
 // MARK: Interpretation section view
 struct InterpretationRow: View {

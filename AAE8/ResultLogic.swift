@@ -7,6 +7,18 @@
 
 import Foundation
 
+struct meaningWithTailC: Hashable {
+    let m: Meaning
+    let tailC: [CCriteria]
+}
+
+struct causeCard: Identifiable {
+    let disease: Disease
+    let paths: [[Meaning]]
+    
+    var id: Int { disease.id }
+}
+
 struct ResultLogic {
     //MARK: cStructure 만들기
     //백트래킹 이용
@@ -130,4 +142,101 @@ struct ResultLogic {
         
         return totalmeaningPaths
     }
+    
+    //MARK: MultiPathsSelection - Disease 추리기
+    // mStructures 기반으로 disease 추리고 나열
+    static func multiPathSelection(
+        paths: [[Meaning]],
+        meaningToDisease: [Meaning: [Disease]]
+    ) -> [causeCard] {
+        
+        // 1. path들 간 겹치는 Meaning들은 빼기 - (e.g., Metabolic acidosis, Respiratory acidosis => Acidosis로 겹치는 경우는 의미가 없음)
+        //Meaning 등장 횟수 계산
+        var meaningCount: [Meaning: Int] = [:]
+        for path in paths {
+            for m in path {
+                meaningCount[m, default: 0] += 1
+            }
+        }
+        // 등장 횟수가 1인 Meaning만 남기기
+        let filteredPaths = paths.map { path in
+            path.filter { meaningCount[$0] == 1 }
+        }
+        
+        // 2. Meaning 조합 순서 정하기
+        var finalMComplexes: [[Meaning]] = []
+        var mComplexInProcess: [Meaning] = []
+        func dfs(i: Int) {
+            if i >= filteredPaths.count {
+                finalMComplexes.append(mComplexInProcess)
+                return
+            }
+            var path = filteredPaths[i]
+            while !path.isEmpty {
+                let m = path.removeLast()
+                mComplexInProcess.append(m)
+                dfs(i: i+1)
+                mComplexInProcess.removeLast()
+            }
+        }
+        dfs(i: 0)
+        //print("🍃\(finalComplexes)")
+        
+        // 3. 가장 작은 범위 조합부터 해당되는 diseases들부터 배치
+        var result: [Disease] = []
+        var diseaseAndFinalMComplex: [(Disease, [Meaning])] = []
+        guard let mostBroadComplex = finalMComplexes.last else {return []}
+        var wholeDiseases = diseasesSatisfyingAllMeanings(meanings: mostBroadComplex, meaningToDisease: meaningToDisease)
+        for finalMComplex in finalMComplexes {
+            for d in diseasesSatisfyingAllMeanings(meanings: finalMComplex, meaningToDisease: meaningToDisease).sorted(by: { $0.id < $1.id }) { //귀찮아. 순서가 유지만 되면 되니까 걍 id 순 나열.
+                if wholeDiseases.contains(d) {
+                    result.append(d)
+                    diseaseAndFinalMComplex.append((d, finalMComplex))
+                    wholeDiseases.removeAll { $0.id == d.id }
+                }
+            }
+        }
+        
+        // 4. finalComplex의 path화
+        var causeCards: [causeCard] = []
+        for (disease, meaningComplex) in diseaseAndFinalMComplex {
+            let diseasePaths = meaningCompexToMeaningPath(meaningComplex: meaningComplex, paths: paths)
+            causeCards.append(causeCard(disease: disease, paths: diseasePaths))
+        }
+        
+        return causeCards
+    }
+    
+    private static func diseasesSatisfyingAllMeanings(meanings: [Meaning], meaningToDisease: [Meaning: [Disease]]) -> [Disease] {
+        guard !meanings.isEmpty else { return [] }
+
+        // Convert each Meaning to a Set of Disease IDs
+        let diseaseSets: [Set<Disease>] = meanings.map { Set(meaningToDisease[$0] ?? []) }
+
+        // Find intersection of all sets (common diseases)
+        let commonDiseases = diseaseSets.dropFirst().reduce(diseaseSets[0]) { $0.intersection($1) }
+
+        // Return actual Disease objects
+        return Array(commonDiseases)
+    }
+    
+    private static func meaningCompexToMeaningPath(meaningComplex: [Meaning], paths: [[Meaning]]) -> [[Meaning]] {
+        var result: [[Meaning]] = []
+        
+        let totalPathNumber = paths.count
+        for i in 0...totalPathNumber-1{
+            let path = paths[i]
+            var pathProcessing:[Meaning] = []
+            for m in path { // path 젤 앞에서부터 m 나올 때 끊기
+                pathProcessing.append(m)
+                if m == meaningComplex[i] {
+                    break
+                }
+            }
+            result.append(pathProcessing)
+        }
+        
+        return result
+    }
+    
 }
