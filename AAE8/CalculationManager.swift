@@ -175,6 +175,7 @@ struct cCriteriaCalculationManager {
 }
 
 struct CMDUtils {
+    // criteria path를 받아서, 더 이상 tail이 없는 leaf meaning(MCategory:CCriteria타입)을 반환. e.g., High AG MAci, RAci
     static func cCriteriaLeafMeaning(
         criterias: [CCriteria],
         meaningDict: [Int: Meaning]
@@ -206,6 +207,20 @@ struct CMDUtils {
         return leafMeanings
     }
     
+    //criteria path로 도달할 수 있는 Meaning은 CCriteria 타입 leafMeaning까지. leafMeaning의 하위 Meaning들을 전부 찾아서 반환.
+    static func meaningToTailEndMeaning(meaning: Meaning, meaningDict: [Int: Meaning]) -> [Meaning] {
+        var queue = [meaning]
+        var result: [Meaning] = []
+        
+        while !queue.isEmpty{
+            let meaning = queue.removeFirst()
+            result.append(meaning)
+            queue += meaning.tailMID.compactMap({meaningDict[$0]})
+        }
+        return result
+    }
+    
+    // case에서 Meaning에 도달한 criteria 경로를 보여줌. 극히 예외적인 경우를 제외하곤 [[CCriteria]]의 element 개수는 1 (criteria 여러개가 하나의 meaning을 가리킬 + 그 criteria 중 두 개 이상을 케이스가 만족함 => element 개수 2 이상)
     static func criteriaPathToMeaning(criteriaPaths:[[CCriteria]], meaningDict: [Int: Meaning]
     ) -> [Meaning: [[CCriteria]]] { // [1: [path1, path2, ...] ]
         var result: [Meaning: [[CCriteria]]] = [:]
@@ -219,19 +234,9 @@ struct CMDUtils {
         return result
     }
     
-    static func meaningToTailEndMeaning(meaning: Meaning, meaningDict: [Int: Meaning]) -> [Meaning] {
-        var queue = [meaning]
-        var result: [Meaning] = []
-        
-        while !queue.isEmpty{
-            let meaning = queue.removeFirst()
-            result.append(meaning)
-            queue += meaning.tailMID.compactMap({meaningDict[$0]})
-        }
-        return result
-    }
     
-    static func meaningToDisease( // 하위 M의 disese 다 포함 + 중복없앰
+    // 하위 M의 disese 다 포함 + 중복없앰
+    static func meaningToDisease(
         meaning: Meaning,
         meaningDict: [Int: Meaning],
         diseaesDict: [Int: Disease]
@@ -277,6 +282,20 @@ struct CMDUtils {
 //        return diseaseRouteDict
 //    }
     
+    
+    
+    //    enum RouteID: Hashable, CustomStringConvertible {
+    //        case meaning(Int)
+    //        case disease(Int)
+    //
+    //        var description: String {
+    //            switch self {
+    //            case .meaning(let id): return "M\(id)"
+    //            case .disease(let id): return "D\(id)"
+    //            }
+    //        }
+    //    }
+    
     // "diseaseRoute": Disease의 route를 전부 저장하는 딕셔너리 만들기
     // Meaning에 root Meaning(headID가 없는)을 넣어서 각 Disease들 full meaning route 반환. BFS 사용.
     static func diseaseToFullMeaningRoute(
@@ -303,19 +322,7 @@ struct CMDUtils {
         return diseaseRouteDict
     }
     
-//    enum RouteID: Hashable, CustomStringConvertible {
-//        case meaning(Int)
-//        case disease(Int)
-//        
-//        var description: String {
-//            switch self {
-//            case .meaning(let id): return "M\(id)"
-//            case .disease(let id): return "D\(id)"
-//            }
-//        }
-//    }
-    
-    //Disease의 route를 전부 저장하는 딕셔너리
+    //Disease의 route를 전부 저장하는 딕셔너리 (Disease 간의 위계관계도 표현. 단, Disease 간의 위계는 한 층이 최대이어야만 함)
     static func buildDiseaseRoute(
             meaningDict: [Int: Meaning],
             diseaseDict: [Int: Disease]
@@ -348,6 +355,7 @@ struct CMDUtils {
     }
     
     
+    // criteria path를 말(=String)로 바꿔줌
     static func CCriteriaRouteToString (criteriaPath: [CCriteria]) -> String {
         var criteriaStrs: [String] = []
         for c in criteriaPath {

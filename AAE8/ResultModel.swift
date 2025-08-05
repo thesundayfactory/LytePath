@@ -227,7 +227,7 @@ struct ResultLogic {
         for i in 0...totalPathNumber-1{
             let path = paths[i]
             var pathProcessing:[Meaning] = []
-            for m in path { // path 젤 앞에서부터 m 나올 때 끊기
+            for m in path { // path 젤 앞에서부터 meaning 나올 때 끊기
                 pathProcessing.append(m)
                 if m == meaningComplex[i] {
                     break
