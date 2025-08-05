@@ -210,11 +210,6 @@ struct CMDUtils {
     ) -> [Meaning: [[CCriteria]]] { // [1: [path1, path2, ...] ]
         var result: [Meaning: [[CCriteria]]] = [:]
         for path in criteriaPaths {
-//            if let c = path.last {
-//                for m in c.meaningID.compactMap({meaningDict[$0]}) {
-//                    result[m, default: []].append(path)
-//                }
-//            }
             for (i,c) in path.enumerated() {
                 for m in c.meaningID.compactMap({meaningDict[$0]}){
                     result[m, default: []].append(Array(path[...i]))
@@ -223,28 +218,6 @@ struct CMDUtils {
         }
         return result
     }
-    
-//    static func criteriaAscendingPath(
-//        criteriaID: Int,
-//        headCIDDictByTailCID: [Int: [HeadTailRelation]]
-//    ) -> [[Int]] {
-//        var paths: [[Int]] = []
-//
-//        func dfs(current: Int, path: [Int]) {
-//            // Base case: no parent → reached root
-//            guard let heads = headCIDDictByTailCID[current] else {
-//                paths.append(path)
-//                return
-//            }
-//
-//            for relation in heads {
-//                dfs(current: relation.headID, path: [relation.headID] + path)
-//            }
-//        }
-//
-//        dfs(current: criteriaID, path: [criteriaID])
-//        return paths
-//    }
     
     static func meaningToTailEndMeaning(meaning: Meaning, meaningDict: [Int: Meaning]) -> [Meaning] {
         var queue = [meaning]

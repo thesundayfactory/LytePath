@@ -185,7 +185,7 @@ class CCriteriaStore {
 
     func loadFile() {
         // CSV 파일 이름 (확장자는 .csv 생략)
-        let cCriteriaList = loadCCriteria(fromCSV: "LabCriteria_ver 4_new11_edited")
+        let cCriteriaList = loadCCriteria(fromCSV: "LabCriteria_ver 4_new12_edited")
         for cCriteria in cCriteriaList {
             all[cCriteria.id] = cCriteria
         }
@@ -215,9 +215,20 @@ class CCriteriaStore {
         let allTailIDs = Set(cCRelation.map { $0.tailID })
         let rootCIDs = allCIDs.subtracting(allTailIDs)
         let rootCriterias = rootCIDs.compactMap{all[$0]}
-        print("✅ \(rootCriterias.count) rootCriteria loaded.")
+        let sortedRootCriterias = rootCriterias.sorted {
+            guard let i0 = Electrolyte.displayOrder.firstIndex(of: $0.electrolyte),
+                      let i1 = Electrolyte.displayOrder.firstIndex(of: $1.electrolyte) else {
+                    return false
+                }
+                if i0 != i1 {
+                    return i0 < i1
+                } else {
+                    return $0.order < $1.order
+                }
+        }
+        //print("✅ \(rootCriterias.count) rootCriteria loaded.")
         //print(rootCriterias)
-        return rootCriterias
+        return sortedRootCriterias
     }
     
     var cMRelation: [HeadTailRelation] {
@@ -243,7 +254,7 @@ class MeaningStore {
 
     func loadFile() {
         // CSV 파일 이름 (확장자는 .csv 생략)
-        let meaningList = loadMeaning(fromCSV: "Meaning_ver 4_new11_edited")
+        let meaningList = loadMeaning(fromCSV: "Meaning_ver 4_new12_edited")
         for meaning in meaningList {
             all[meaning.id] = meaning
         }
@@ -311,7 +322,7 @@ class DiseaseStore {
 
     func loadFile() {
         // CSV 파일 이름 (확장자는 .csv 생략)
-        let diseaseList = loadDisease(fromCSV: "Disease_ver 4_new11_edited")
+        let diseaseList = loadDisease(fromCSV: "Disease_ver 4_new12_edited")
         for disease in diseaseList {
             all[disease.id] = disease
         }

@@ -100,7 +100,7 @@ struct InterpretationMoreView: View {
             caseLeafMeanings = CMDUtils.cCriteriaLeafMeaning(criterias: matchedcCriteria, meaningDict: meaningDict).flatMap({CMDUtils.meaningToTailEndMeaning(meaning: $0, meaningDict: meaningDict)})
             //print("🍃caseLeafMeaning: \(caseLeafMeanings)")
             meaningPaths = CMDUtils.criteriaPathToMeaning(criteriaPaths: matchedcCriteriaPaths, meaningDict: meaningDict)
-            print("🍃MeaningPaths: \(meaningPaths)")
+            //print("🍃MeaningPaths: \(meaningPaths)")
         }
         .navigationTitle("Analysis Details")
         .navigationBarTitleDisplayMode(.inline)
@@ -152,12 +152,7 @@ func meaningToInterpretationNode(
     if let paths = casePath[meaning] {
         for path in paths {
             let pathStr = CMDUtils.CCriteriaRouteToString(criteriaPath: path)
-//            let pathStr = path.map { crit in
-//                let dir = crit.direction == .high ? "↑" : "↓"
-//                return "\(crit.para.displayName) \(String(format: "%.2f", crit.thres)) \(dir)"
-//            }.joined(separator: " & ")
             criteriaPaths.append(pathStr)
-            //criteriaPathsStr += "\n" + "• " + pathStr
         }
     }
     let criteriaPathsStr = criteriaPaths
@@ -205,7 +200,7 @@ func meaningToInterpretationNode(
     
     // 2. childrenList 만들기
     var childrenList: [InterpretationNode] = []
-    // 3. children 중 Disease 타입
+    // 1) children 중 Disease 타입
     let isLeafMeaning = caseLeafM.contains(meaning)
     let childrenCandidates = meaning.diseaseID.compactMap({diseaseDict[$0]})
     for d in childrenCandidates.filter( { d in
@@ -214,7 +209,7 @@ func meaningToInterpretationNode(
         childrenList.append(diseaseToInterpretationNode(disease: d, path: path, childrenCandidates: childrenCandidates, isCase: isLeafMeaning))
     }
     
-    //4. children 중 Meaning 타입
+    // 2) children 중 Meaning 타입
     let sortedTailMeanings = meaning.tailMID.compactMap({meaningDict[$0]})
         .sorted {
             guard let i0 = Electrolyte.displayOrder.firstIndex(of: $0.electrolyte),
@@ -243,10 +238,6 @@ func diseaseToInterpretationNode(disease: Disease, path: [Meaning], childrenCand
             childrenList.append(InterpretationNode(type: .Disease, path: path, meaning: nil, disease: d, children: d.causeDID.compactMap{diseaseDict[$0]}.compactMap{diseaseToInterpretationNode(disease: $0, path: path, childrenCandidates: childrenCandidates, isCase: isCase)}, isCase: isCase))
         }
     }
-    //if isCase {print("🍃caseDisease: \(title)")}
-//    if let description = disease.description {
-//        return InterpretationNode(title: title, children: childrenList, isCase: isCase, description: description)
-//    }
     return InterpretationNode(type: .Disease, path: path, meaning: nil, disease: disease, children: childrenList, isCase: isCase)
 }
 
@@ -317,18 +308,6 @@ struct InterpretationTreeView: View {
                         }
                     }
                     HStack{
-                        //                        Button(action: {
-                        //                            if !node.children.isEmpty {
-                        //                                withAnimation(.easeInOut) {
-                        //                                    isExpanded.toggle()
-                        //                                }
-                        //                            }
-                        //                        }) {
-                        //                            Image(systemName: node.children.isEmpty ? "" : (isExpanded ? "minus" : "plus"))
-                        //                                .foregroundColor(.gray)
-                        //                                .frame(width: 12)
-                        //                        }
-                        //                        .disabled(node.children.isEmpty) // no interaction for leaf nodes
                         if depth == 0{
                             if let rootNode = node.path.first{
                                 ArrowCircleView(electrolyte: rootNode.electrolyte, arrow: rootNode.arrow ?? "?")
@@ -384,16 +363,12 @@ struct InterpretationTreeView: View {
                 .padding(.horizontal, 12)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .cornerRadius(12)
-//                .background(
-//                    node.isCase ? Color.customYellow.opacity(0.1) : Color.clear
-//                )
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(Color.black.opacity(0.05))
                 )
             }
         }
-//        .background(backgroundColor(for: depth))
         .padding(.leading, CGFloat(depth) * 12)
             
             if isExpanded{
@@ -403,16 +378,4 @@ struct InterpretationTreeView: View {
             }
         
     }
-
-//    func backgroundColor(for depth: Int) -> Color {
-//        switch depth {
-//        case 0: return Color.yellow.opacity(0.4)
-//        case 1: return Color.yellow.opacity(0.3)
-//        case 2: return Color.yellow.opacity(0.2)
-//        case 3: return Color.green.opacity(0.3)
-//        case 4: return Color.green.opacity(0.25)
-//        case 5: return Color.blue.opacity(0.2)
-//        default: return Color.gray.opacity(0.1)
-//        }
-//    }
 }

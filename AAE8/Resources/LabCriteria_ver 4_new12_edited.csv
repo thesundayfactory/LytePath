@@ -1,8 +1,8 @@
 ID,Electrolyte,parameter,threshold,direction,TailID,MeaningID,Order,Point
-87,pH,PPH,7.35,High,119;95,,1,
+87,pH,PPH,7.45,Low,119;91,,1,
 84,K,PK,5.5,Low,118;80,,1,
 39,Na,PNa,145,Low,114;27,,1,
-119,pH,PPH,7.45,Low,90;88;89;163,,2,
+119,pH,PPH,7.35,High,90;88;89;163,,2,
 118,K,PK,3.5,High,,22,2,1
 114,Na,PNa,135,High,,36,2,1
 88,pH,PAG,12,High,123;161,,3,

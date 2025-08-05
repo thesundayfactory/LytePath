@@ -57,7 +57,6 @@ struct DotGroupView: View {
             ForEach(0..<count, id: \.self) { _ in
                 Circle()
                     .fill(color)
-                    //.fill(color.opacity(0.3))
                     .frame(width: 8, height: 8)
             }
         }
@@ -69,7 +68,6 @@ struct LabPickerCell<T: Hashable & CaseIterable & Identifiable & RawRepresentabl
     var label: String
     var selection: Binding<T>
     var isDisplay: Bool
-//    var backgroundColor: Color = Color.gray.opacity(0.2)
     var fullName: String
     var explanation: String?
     
@@ -123,9 +121,6 @@ struct LabPickerCell<T: Hashable & CaseIterable & Identifiable & RawRepresentabl
                 }
             }
             HStack {
-//                Text(label)
-//                    .frame(width: 120)
-//                Spacer()
                 Picker(label, selection: selection) {
                     ForEach(Array(T.allCases)) { option in
                         Text(option.rawValue).tag(option)
@@ -135,9 +130,7 @@ struct LabPickerCell<T: Hashable & CaseIterable & Identifiable & RawRepresentabl
                 .tint(Color.customDarkGreen)
                 .frame(width: 145)
                 .cornerRadius(5)
-                //.padding(.horizontal)
                 .background(Color.customLightGreen.opacity(0.2))
-                //Spacer()
             }
             if showInfo {
                 LabInfoBoxPickerCell(fullName: fullName, explanation: explanation)
@@ -151,7 +144,6 @@ struct LabPickerCell<T: Hashable & CaseIterable & Identifiable & RawRepresentabl
             RoundedRectangle(cornerRadius: 10)
                 .stroke(isDisplay ? Color.customGreen: Color.clear, lineWidth: 3)
         )
-        //.padding(.horizontal)
     }
 }
 
@@ -162,15 +154,11 @@ struct LabCell: View {
     var placeholder: String? = nil
     var displayValue: String? = nil // for read-only
     var isDisplay: Bool
-//    var backgroundColor: Color = Color.customLightGreen.opacity(0.2)
     var fullName: String
     var unit: String
     let normalRange: String?
     var formula: String? = nil //for read-only
-//    var caption: String? = nil
-//    var captionColor: Color = .gray
     var isEditable: Bool = true
-//    var highlight: Bool = false
     var isInvalid: Bool = false
     
     @State private var showInfo = false
@@ -200,7 +188,6 @@ struct LabCell: View {
                             return font
                         }()
                     )
-                //.frame(maxWidth: .infinity, alignment: .leading)
                     .background(
                         {
                             var base: Color
@@ -226,12 +213,6 @@ struct LabCell: View {
                         .foregroundColor(Color.customGreen)
                 }
                 Spacer()
-//                if let caption = caption {
-//                    Text(caption)
-//                        .font(.caption)
-//                        .foregroundColor(captionColor)
-//                        //.frame(maxWidth: .infinity, alignment: .leading)
-//                }
                 Button(action: {
                     showInfo.toggle()
                 }) {
@@ -243,7 +224,6 @@ struct LabCell: View {
                 Text(label)
                     .frame(width: 62)
                     .foregroundColor(.customDarkGreen)
-                //Spacer()
                 if isEditable, let binding = valueBinding {
                     ZStack(alignment: .leading) {
                         if let placeholder = placeholder, binding.wrappedValue.isEmpty {
@@ -267,10 +247,6 @@ struct LabCell: View {
                                 RoundedRectangle(cornerRadius: 5)
                                     .stroke(isInvalid ? Color.customRed : Color.clear, lineWidth: 3)
                             )
-                        //                        .overlay(
-                        //                            RoundedRectangle(cornerRadius: 5)
-                        //                                .stroke(highlight ? Color.fontDeepBlue : Color.clear, lineWidth: 5)
-                        //                        )
                             .cornerRadius(5)
                             .zIndex(0)  // ⬅️ This ensures placeholder stays visible when empty
                     }
@@ -284,16 +260,8 @@ struct LabCell: View {
                         .foregroundColor(.customDarkGreen)
                         .cornerRadius(5)
                 }
-                //Text(unit)
-                    //.font(.caption)
-            }
 
-//            if let caption = caption {
-//                Text(caption)
-//                    .font(.caption)
-//                    .foregroundColor(captionColor)
-//                    .frame(maxWidth: .infinity, alignment: .leading)
-//            }
+            }
             if isInvalid {
                 Text("Value out of range")
                     .font(.caption)
@@ -310,7 +278,6 @@ struct LabCell: View {
         .padding()
         .background(Color.customWhite.opacity(0.2))
         .cornerRadius(10)
-        //.padding(.horizontal)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(isDisplay ? Color.customGreen: Color.clear, lineWidth: 3)

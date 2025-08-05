@@ -43,64 +43,6 @@ struct ResultViewNew: View {
     var diseaseRoute: [Disease: [[String]]] {
         CMDUtils.buildDiseaseRoute(meaningDict: meaningDict, diseaseDict: diseaseDict)
     }
-//    var diseaseRoute: [Disease: [[String]] ] {
-//        var result: [Disease: [[String]] ] = [:]
-//
-//        let rootMeanings = MeaningStore.shared.rootMeanings
-////        let rootMeaning = meaningDict.values.filter { headMIDDictByTailMID[$0.id] == nil }.sorted {
-////            guard let i0 = Electrolyte.displayOrder.firstIndex(of: $0.electrolyte),
-////                      let i1 = Electrolyte.displayOrder.firstIndex(of: $1.electrolyte) else {
-////                    return false
-////                }
-////                if i0 != i1 {
-////                    return i0 < i1
-////                } else {
-////                    return $0.order < $1.order
-////                }
-////        }
-//        
-//        let routeDict = rootMeanings
-//            .map { CMDUtils.diseaseToFullMeaningRoute(meaning: $0, meaningDict: meaningDict, diseaesDict: diseaseDict) }
-//            .reduce(into: [Disease: [[Meaning]]]() ) { result, dict in
-//                for (disease, routes) in dict {
-//                    result[disease, default: []] += routes
-//                }
-//            }
-//        
-////        for meaning in rootMeanings {
-////            let routeDict = CMDUtils.diseaseToFullMeaningRoute(
-////                meaning: meaning,
-////                meaningDict: meaningDict,
-////                diseaesDict: diseaseDict
-////            )
-//
-//            for (disease, routes) in routeDict {
-//                for route in routes{
-//                    var fullMeaningRouteKey: [String] = route.map { "M"+String($0.id)}
-//                    
-//                    // Disease head 넣기. D계층은 최대 한 층이어야 함. ... > M > D > D 이어야 함 (D > D > D X)
-//                    let headIDs = disease.resultDID
-//                    if let leafM = route.last {
-//                        for headID in headIDs {
-//                            if leafM.diseaseID.contains(headID) {
-//                                fullMeaningRouteKey.append("D"+String(headID))
-//                            }
-//                        }
-//                    }
-//                    result[disease, default: []].append(fullMeaningRouteKey)
-//                }
-//            }
-////        }
-//
-//        return result
-//    }
-    
-//    typealias criteriaPath = [CCriteria]
-////    @State private var waitingCriteriaQueue: [(current: CCriteria, path: criteriaPath)] = []
-//    @State private var matchedcCriteria: [CCriteria] = []
-//    @State private var matchedcCriteriaPaths: [criteriaPath] = []
-//    typealias meaningPath = [meaningWithTailC]
-//    @State private var mStructures: [[meaningWithTailC]] = []
     
     var body: some View {
         NavigationStack {
@@ -135,14 +77,6 @@ struct ResultViewNew: View {
                 }
                 .padding()
             }
-//            .onAppear {
-//                //waitingCriteriaQueue = []
-//                matchedcCriteria = []
-//                matchedcCriteriaPaths = []
-//                mStructures = []
-//                backtrackAllCCriteriaPaths()
-//                mStructures = makeMeaningPaths()
-//            }
             .navigationTitle("Analysis Result")
         }
     }
@@ -291,7 +225,7 @@ struct ResultViewNew: View {
         
     }
     
-    // MARK: - Helper Views
+    // MARK: - Header Views
     private func sectionHeader(_ title: String) -> some View {
         HStack {
             Text(title).font(.title3).bold()
@@ -299,215 +233,7 @@ struct ResultViewNew: View {
         }
     }
     
-    // MARK: - Data processing
-//    //cStructures 만들기 - 백트래킹
-//    func backtrackAllCCriteriaPaths() {
-//        matchedcCriteria = []
-//        matchedcCriteriaPaths = []
-//
-//        let relatedRootCriterias = rootCriteriaList.filter { data.selectedElectrolytes.contains($0.electrolyte) }
-//
-//        for root in relatedRootCriterias {
-//            if cCriteriaCalculationManager.evaluatecCriteria(labValues: data.labValues, parameter: root.para, threshold: root.thres, direction: root.direction){
-//                matchedcCriteria.append(root)
-//                if root.meaningID.isEmpty {
-//                    dfs(current: root, path: [], temp: [root])
-//                } else {
-//                    dfs(current: root, path: [root], temp: [])
-//                }
-//            }
-//        }
-//
-//        print("🧩 DFS matchedCriteriaPaths: \(matchedcCriteriaPaths.count)")
-//    }
-//
-//    func dfs(current: CCriteria, path: [CCriteria], temp: [CCriteria]) -> Bool{
-//
-//        let tailCriterias = current.tailCID.compactMap { cCriteriaDict[$0] }
-//
-//        var hasValidChild = false
-//        for next in tailCriterias {
-//            if cCriteriaCalculationManager.evaluatecCriteria(
-//                labValues: data.labValues,
-//                parameter: next.para,
-//                threshold: next.thres,
-//                direction: next.direction
-//            ) {
-//                matchedcCriteria.append(next)
-//                if next.meaningID.isEmpty {
-//                    hasValidChild = hasValidChild || dfs(current: next, path: path, temp: temp + [next])
-//                } else {
-//                    hasValidChild = true
-//                    dfs(current: next, path: path + temp + [next], temp: [])
-//                }
-//            }
-//        }
-//
-//        // 끝에 meaningID가 있고, 더 이상 유효한 child가 없을 때만 저장
-//        if !hasValidChild && !current.meaningID.isEmpty {
-//            matchedcCriteriaPaths.append(path)
-//        }
-//        
-//        return hasValidChild
-//    }
-//    
-//    
-//    // mStructures 만들기
-//    func makeMeaningPaths() ->  [[meaningWithTailC]] {
-//        var totalmeaningPaths: [[meaningWithTailC]] = []
-//        for cStructure in matchedcCriteriaPaths {
-//            var priorPaths: [[meaningWithTailC]] = []
-//            var currentPaths: [[meaningWithTailC]] = []
-//            var prev: Int = -1
-//            var cur: Int = 0
-//            let endIndex = cStructure.count
-//            while cur < endIndex {
-//                let c = cStructure[cur]
-//                let tailCs = Array(cStructure[prev+1...cur])
-//                
-//                if c.meaningID.count == 0 {
-//                    cur += 1
-//                    continue
-//                }
-//                
-//                for mID in c.meaningID {
-//                    guard let m = meaningDict[mID] else {continue}
-//                    let mComplex = meaningWithTailC(m: m, tailC: tailCs)
-//                    
-//                    var isRoot = true
-//                    for existingPath in priorPaths {
-//                        guard let leafM = existingPath.last else {continue}
-//                        if leafM.m.tailMID.contains(mID) {
-//                            currentPaths.append(existingPath + [mComplex])
-//                            isRoot = false
-//                        } else {
-//                            currentPaths.append(existingPath)
-//                        }
-//                    }
-//                    if isRoot {
-//                        currentPaths.append([mComplex])
-//                    }
-//                }
-//                
-//                priorPaths = currentPaths
-//                currentPaths = []
-//                prev = cur
-//                cur += 1
-//            }
-//        totalmeaningPaths += priorPaths
-//        }
-//        print("🍃mStructures: \(totalmeaningPaths)")
-//    return totalmeaningPaths
-//    }
-    
-    
-//    // mStructures 기반으로 disease 추리고 나열
-//    func multiPathSelection(paths: [[Meaning]]) -> [causeCard] {
-//        
-//        // 1. Meaning 등장 횟수 계산
-//        var meaningCount: [Meaning: Int] = [:]
-//        for path in paths {
-//            for m in path {
-//                meaningCount[m, default: 0] += 1
-//            }
-//        }
-//
-//        // 2. 등장 횟수가 1인 Meaning만 남기기
-//        let filteredPaths = paths.map { path in
-//            path.filter { meaningCount[$0] == 1 }
-//        }
-//
-//        
-//        // m 조합 순서 정하기
-//        var finalComplexes: [[Meaning]] = []
-//        var complexInProcess: [Meaning] = []
-//        func dfs(i: Int) {
-//            if i >= filteredPaths.count {
-//                finalComplexes.append(complexInProcess)
-//                return
-//            }
-//            var path = filteredPaths[i]
-//            while !path.isEmpty {
-//                let m = path.removeLast()
-//                complexInProcess.append(m)
-//                dfs(i: i+1)
-//                complexInProcess.removeLast()
-//            }
-//        }
-//        dfs(i: 0)
-//        print("🍃\(finalComplexes)")
-//        
-//        // 가장 작은 범위 조합부터 해당되는 diseases 들 배치
-//        var result: [Disease] = []
-//        var diseaseAndFinalComplex: [(Disease, [Meaning])] = []
-//        guard let mostBroadComplex = finalComplexes.last else {return []}
-//        var wholeDiseases = diseasesSatisfyingAllMeanings(meanings: mostBroadComplex)
-//        for finalComplex in finalComplexes {
-//            for d in diseasesSatisfyingAllMeanings(meanings: finalComplex).sorted(by: { $0.id < $1.id }) { //귀찮아. 순서가 유지만 되면 되니까 걍 id 순 나열.
-//                if wholeDiseases.contains(d) {
-//                    result.append(d)
-//                    diseaseAndFinalComplex.append((d, finalComplex))
-//                    wholeDiseases.removeAll { $0.id == d.id }
-//                }
-//            }
-//        }
-//        
-//        // finalComplex의 path화
-//        var causeCards: [causeCard] = []
-//        for (disease, meaningComplex) in diseaseAndFinalComplex {
-//            let diseasePaths = meaningCompexToMeaningPath(meaningComplex: meaningComplex, paths: paths)
-//            causeCards.append(causeCard(disease: disease, paths: diseasePaths))
-//        }
-//        
-//        //print("🍃\(result)")
-//        return causeCards
-//    }
-//    
-//    func diseasesSatisfyingAllMeanings(meanings: [Meaning]) -> [Disease] {
-//        guard !meanings.isEmpty else { return [] }
-//
-//        // Convert each Meaning to a Set of Disease IDs
-//        let diseaseSets: [Set<Disease>] = meanings.map { Set(meaningToDisease[$0] ?? []) }
-//
-//        // Find intersection of all sets (common diseases)
-//        let commonDiseases = diseaseSets.dropFirst().reduce(diseaseSets[0]) { $0.intersection($1) }
-//
-//        // Return actual Disease objects
-//        return Array(commonDiseases)
-//    }
-//    
-//    func meaningCompexToMeaningPath(meaningComplex: [Meaning], paths: [[Meaning]]) -> [[Meaning]] {
-//        var result: [[Meaning]] = []
-//        
-//        let totalPathNumber = paths.count
-//        for i in 0...totalPathNumber-1{
-//            let path = paths[i]
-//            var pathProcessing:[Meaning] = []
-//            for m in path { // path 젤 앞에서부터 m 나올 때 끊기
-//                pathProcessing.append(m)
-//                if m == meaningComplex[i] {
-//                    break
-//                }
-//            }
-//            result.append(pathProcessing)
-//        }
-//        
-//        return result
-//    }
-    
 }
-
-//struct meaningWithTailC: Hashable {
-//    let m: Meaning
-//    let tailC: [CCriteria]
-//}
-
-//struct causeCard: Identifiable {
-//    let disease: Disease
-//    let paths: [[Meaning]]
-//    
-//    var id: Int { disease.id }
-//}
 
 // MARK: Interpretation section view
 struct InterpretationRow: View {
@@ -648,7 +374,6 @@ struct TopCauseDetailWithDots: View {
                 }
 
                 ForEach(matchedRoutes, id:\.self) { route in
-//                    VStack{
                         let routeText = route.compactMap { idString -> Text? in
                             if idString.starts(with: "M"), let id = Int(idString.dropFirst()), let meaning = meaningDict[id] {
                                 let text = Text(meaning.name)
@@ -670,7 +395,6 @@ struct TopCauseDetailWithDots: View {
                         routeText.reduce(Text(""), { $0 + Text(" > ") + $1 })
                             .font(.caption2)
                             .foregroundColor(.customDarkGreen)
-//                    }
                 }
             }
             ForEach(unmatchedRoutes, id: \.self) { route in
@@ -853,12 +577,6 @@ struct singlePathTreeView: View {
             .padding(.leading, CGFloat(depth) * 12)
             
             if isExpanded{
-//                if node.type=="Disease"{
-//                    if let disease = node.disease {
-//                        let card = causeCard(disease: disease, paths: [node.path])
-//                        TopCauseDetailWithDots(card: card, diseaseRoute: diseaseRoute, meaningDict: meaningDict, diseaseDict: diseaseDict)
-//                    }
-//                }
                 ForEach(node.children) { child in
                     singlePathTreeView(node: child, depth: depth + 1, diseaseRoute: diseaseRoute)
                 }

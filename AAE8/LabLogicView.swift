@@ -17,8 +17,6 @@ struct LogicNode : Identifiable {
 struct LogicView: View {
     let meaningDict = MeaningStore.shared.all
     
-    //@State private var criteriaPaths: [[CCriteria]] = []
-    
     var body: some View {
         ScrollView{
             VStack(alignment: .leading) {
