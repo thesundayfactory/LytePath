@@ -220,7 +220,7 @@ struct CMDUtils {
         return result
     }
     
-    // case에서 Meaning에 도달한 criteria 경로를 보여줌. 극히 예외적인 경우를 제외하곤 [[CCriteria]]의 element 개수는 1 (criteria 여러개가 하나의 meaning을 가리킬 + 그 criteria 중 두 개 이상을 케이스가 만족함 => element 개수 2 이상)
+    // case에서 Meaning에 도달한 criteria 경로를 보여줌. 극히 예외적인 경우를 제외하곤 [[CCriteria]]의 element 개수는 1 (criteria 여러개가 하나의 meaning을 가리킴 + 그 criteria 중 두 개 이상을 케이스가 만족함 => element 개수 2 이상)
     static func criteriaPathToMeaning(criteriaPaths:[[CCriteria]], meaningDict: [Int: Meaning]
     ) -> [Meaning: [[CCriteria]]] { // [1: [path1, path2, ...] ]
         var result: [Meaning: [[CCriteria]]] = [:]
