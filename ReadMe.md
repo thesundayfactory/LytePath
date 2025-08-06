@@ -4,15 +4,6 @@
 
 ---
 
-## 📸 Screenshots
-### Input View
-![Input View](LytePath_Screenshots_iPhone16ProMax/Simulator Screenshot - iPhone 16 Pro Max - 2025-08-04 at 21.16.41.png)
-### Result View
-![Result View](LytePath_Screenshots_iPhone16ProMax/Simulator Screenshot - iPhone 16 Pro Max - 2025-08-02 at 21.33.43.png)
-
-### More View
-![More View](LytePath_Screenshots_iPhone16ProMax/Simulator Screenshot - iPhone 16 Pro Max - 2025-08-02 at 21.44.33.png)
-
 ## 🔍 Features
 
 - Select target electrolytes: **Na**, **K**, **pH**
