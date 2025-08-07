@@ -11,9 +11,9 @@ ID,Electrolyte,Category,Name,TailMID,DiseaseID,Order,Arrow
 15,pH,CCriteria,Accumulation of unmeasured acidic compounds (toxic-alcohol),118,,5,
 16,pH,CCriteria,Cl excess or Extrarenal HCO3 loss,119;120,,7,
 17,pH,CCriteria,Renal HCO3 loss,121;122,39;163,8,
-18,pH,CCriteria,Chloride-responsive metabolic alkalosis,123;124;125,,12,
-19,pH,CCriteria,Chloride-resistant metabolic alkalosis,20;21,,13,
-20,pH,CCriteria,Renal tubular Cl loss,,242;108;159;142;181;170,14,
+18,pH,CCriteria,Chloride-responsive metabolic alkalosis,123;124,,12,
+19,pH,CCriteria,Chloride-unresponsive metabolic alkalosis,20;21,,13,
+20,pH,CCriteria,Renal tubular Cl loss,,242;108;159;142;181;170;110;9;37;144,14,
 21,pH,CCriteria,Aldosterone ↑,126;127;128;129,,15,
 22,K,CCriteria,Normokalemia,,,1,-
 23,K,CCriteria,Hypokalemia,25;26,,2,↓
@@ -115,8 +115,7 @@ ID,Electrolyte,Category,Name,TailMID,DiseaseID,Order,Arrow
 121,pH,Mechanism,Renal acidosis,138,66;30;68;16;145;34,8.1,
 122,pH,Mechanism,Drug-induced hyperkalemia (with renal insufficiency),150,231;71;143;120;236;238;147,8.2,
 123,pH,Mechanism,Exogenous HCO3 load,,60;195,12.1,
-124,pH,Mechanism,GI origin,,29;19;40;134,12.2,
-125,pH,Mechanism,Renal origin,,110;9;37;144,12.3,
+124,pH,Mechanism,GI H or Cl loss,,29;19;40;134;283,12.2,
 126,pH,Mechanism,Primary hyperaldosteronism (Low-renin),,42;97;49;137,15.1,
 127,pH,Mechanism,Glucocorticoid ↑,,151,15.2,
 128,pH,Mechanism,Apparent mineralocorticoid excess (Low-renin),,203;185;162;194;204,15.3,

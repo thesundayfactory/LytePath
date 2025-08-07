@@ -171,7 +171,7 @@ ID,Type,Typical,Name,ResultDiseaseID,CauseDiseaseID,RelatedDiseaseID,Description
 238,Diagnosis,Yes,Calcineurin inhibitors,,,,(ex) cyclosporine; tacrolimus)
 239,Diagnosis,Yes,Cirrhosis,265,,,
 235,Diagnosis,Yes,Profuse sweating,,,,
-242,Finding,Yes,Hypercalcemia,,,,
+242,Finding,Yes,Hypercalcemia/hypoparathyroidism,,,,
 245,Diagnosis,No,Secondary adrenal insufficiency,,,,
 246,Diagnosis,No,Secretory diarrhea,178,,,
 247,Diagnosis,Yes,Insulin excess,,,,
@@ -207,3 +207,4 @@ ID,Type,Typical,Name,ResultDiseaseID,CauseDiseaseID,RelatedDiseaseID,Description
 280,Finding,Yes,Kyphoscoliosis,,,,
 281,Diagnosis,Yes,Myasthenia,,,,
 282,Diagnosis,No,Muscular dystrophies,,,,
+283,Diagnosis,No,Villous adenoma,,,,
