@@ -104,8 +104,9 @@ struct HelpView: View {
 
                 Group {
                     Text("• Harrison’s Principles of Internal Medicine, 20th Edition")
-                    Text("• Komatsu, Y., Nishizaki, Y., & Tsugawa, Y. (2013). *Easy Fluid Therapy* (S. Shin, Trans.). Medianbook.")
+                    Text("• The Washington Manual of Medical Therapeutics, 37th Edition ")
                     Text("• Seoul National University College of Medicine, Department of Internal Medicine. (2025). *SNUH Manual of Medicine* (7th ed.). Koonja Publishing.")
+                    Text("• Komatsu, Y., Nishizaki, Y., & Tsugawa, Y. (2013). *Easy Fluid Therapy* (S. Shin, Trans.). Medianbook.")
                     Text("Note: Translations and adaptations were made based on Korean editions where applicable.")
                     Text("Note: The algorithm structure and lab-based decision trees were created manually based on these references and clinical reasoning principles. No copyrighted clinical decision algorithms were used.")
                     }
