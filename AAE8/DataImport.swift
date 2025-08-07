@@ -185,7 +185,7 @@ class CCriteriaStore {
 
     func loadFile() {
         // CSV 파일 이름 (확장자는 .csv 생략)
-        let cCriteriaList = loadCCriteria(fromCSV: "LabCriteria_ver 4_new12_edited")
+        let cCriteriaList = loadCCriteria(fromCSV: "LabCriteria_ver 4_new13_edited")
         for cCriteria in cCriteriaList {
             all[cCriteria.id] = cCriteria
         }
@@ -254,7 +254,7 @@ class MeaningStore {
 
     func loadFile() {
         // CSV 파일 이름 (확장자는 .csv 생략)
-        let meaningList = loadMeaning(fromCSV: "Meaning_ver 4_new12_edited")
+        let meaningList = loadMeaning(fromCSV: "Meaning_ver 4_new13_edited")
         for meaning in meaningList {
             all[meaning.id] = meaning
         }
@@ -322,7 +322,7 @@ class DiseaseStore {
 
     func loadFile() {
         // CSV 파일 이름 (확장자는 .csv 생략)
-        let diseaseList = loadDisease(fromCSV: "Disease_ver 4_new12_edited")
+        let diseaseList = loadDisease(fromCSV: "Disease_ver 4_new13_edited")
         for disease in diseaseList {
             all[disease.id] = disease
         }

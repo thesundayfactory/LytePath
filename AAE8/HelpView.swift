@@ -18,7 +18,7 @@ struct HelpView: View {
                 Group {
                     Text("LytePath is an educational tool designed for medical students, residents, and healthcare professionals.")
                     Text("It helps users analyze electrolyte abnormalities using structured algorithms and suggests possible underlying diseases.")
-                    Text("The logic is based on Harrison’s Internal Medicine and other clinical textbooks.")
+                    Text("The logic is based on Harrison’s Internal Medicine and clinical reasoning principles from other reference materials.")
                     Text("This app is intended for educational support and does not replace clinical judgment.")
 
                 }
@@ -90,10 +90,25 @@ struct HelpView: View {
                     .bold()
                 
                 Group {
-                    Text("This app is intended for educational and clinical support use only by healthcare professionals.")
-                    Text("It is not a diagnostic device, and it does not replace clinical experience, reasoning, or judgment.")
-                    Text("Use of this app should always be accompanied by appropriate clinical context.")
+                    Text("This app is intended for educational and clinical reasoning aid only by healthcare professionals.")
+                    Text("It does not replace physician judgment and should not be used as a standalone diagnostic or treatment tool.")
+                    Text("All suggestions are based on lab inputs and widely accepted clinical mechanisms, but may not account for individual patient variation.")
+                    Text("Users must interpret the results within the context of the full clinical picture.")
                 }
+                
+                Divider()
+
+                Text("References")
+                    .font(.title2)
+                    .bold()
+
+                Group {
+                    Text("• Harrison’s Principles of Internal Medicine, 20th Edition")
+                    Text("• Komatsu, Y., Nishizaki, Y., & Tsugawa, Y. (2013). *Easy Fluid Therapy* (S. Shin, Trans.). Medianbook.")
+                    Text("• Seoul National University College of Medicine, Department of Internal Medicine. (2025). *SNUH Manual of Medicine* (7th ed.). Koonja Publishing.")
+                    Text("Note: Translations and adaptations were made based on Korean editions where applicable.")
+                    Text("Note: The algorithm structure and lab-based decision trees were created manually based on these references and clinical reasoning principles. No copyrighted clinical decision algorithms were used.")
+                    }
                 
                 Divider()
                 

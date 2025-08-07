@@ -1,8 +1,8 @@
 ID,Electrolyte,Category,Name,TailMID,DiseaseID,Order,Arrow
 3,pH,CCriteria,Metabolic acidosis,12;13,,2,↓
 4,pH,CCriteria,Metabolic alkalosis,18;19,,11,↑
-5,pH,CCriteria,Respiratory acidosis,,,9,↓
-6,pH,CCriteria,Respiratory alkalosis,,73,16,↑
+5,pH,CCriteria,Respiratory acidosis,164;165;166;167;168,,9,↓
+6,pH,CCriteria,Respiratory alkalosis,159;160;161;162;163,,16,↑
 10,pH,CCriteria,Acidosis,3;5,,1,↓
 11,pH,CCriteria,Alkalosis,4;6,,10,↑
 12,pH,CCriteria,High anion gap metabolic acidosis,14;15,,3,
@@ -141,4 +141,14 @@ ID,Electrolyte,Category,Name,TailMID,DiseaseID,Order,Arrow
 155,Na,CCriteria,Rare but possibly water intoxication,156;157,,11,
 156,Na,Mechanism,Hypotonic water intake,,201;11;6,11.1,
 157,Na,Mechanism,Low Na intake,,167,11.2,
-158,K,CCriteria,Distal Na delivery intact,34;35,,13,
+158,K,CCriteria,Other than reduced distal sodium delivery,34;35,,13,
+159,pH,Divider,Central nervous system stimulation,,28;126;250;251;252;253;254,16.1,
+160,pH,Divider,Hypoxemia or tissue hypoxia,,259;258;257;256;255,16.2,
+161,pH,Divider,Drugs or hormones,,58;73;260,16.3,
+162,pH,Divider,Stimulation of chest receptors,,261;262;58;263,16.4,
+163,pH,Divider,Miscellaneous,,264;179;89;265;267,16.5,
+164,pH,Divider,Central,,251;253;264;268,9.1,
+165,pH,Divider,Airway,,270;269,9.2,
+166,pH,Divider,Parenchyma,,274;275;276;277;278,9.3,
+167,pH,Divider,Neuromuscular,,279;280;281;282,9.4,
+168,pH,Divider,Miscellaneous,,179;272;273,9.5,
