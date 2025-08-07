@@ -71,7 +71,7 @@ struct InterpretationMoreView: View {
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
-                    .background(Color.customWhite.opacity(0.2))
+                    .background(Color.customGreen.opacity(0.2))
                     .cornerRadius(8)
                 }
             }
@@ -102,7 +102,7 @@ struct InterpretationMoreView: View {
             meaningPaths = CMDUtils.criteriaPathToMeaning(criteriaPaths: matchedcCriteriaPaths, meaningDict: meaningDict)
             //print("🍃MeaningPaths: \(meaningPaths)")
         }
-        .navigationTitle("Analysis Details")
+        .navigationTitle("Details")
         .navigationBarTitleDisplayMode(.inline)
     }
     

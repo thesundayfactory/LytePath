@@ -77,7 +77,7 @@ struct ResultViewNew: View {
                 }
                 .padding()
             }
-            .navigationTitle("Analysis Result")
+            .navigationTitle("Result")
         }
     }
     
@@ -191,12 +191,20 @@ struct ResultViewNew: View {
             let selectedPaths: [[Meaning]] = selectedMeaningPathIndices.map { index in
                 mStructures[index].map({$0.m})
             }
-            if selectedPaths.count >= 2 {
-                let inferredDiseases = ResultLogic.multiPathSelection(paths: selectedPaths, meaningToDisease: meaningToDisease).filter{$0.disease.typical == true}
+            // Normal Meanings 필터링
+            let filteredSelectedPaths: [[Meaning]] = selectedPaths.filter{ path in
+                if let root = path.first {
+                    if root.arrow != "-" {
+                        return true
+                    }
+                }
+                return false
+            }
+            if filteredSelectedPaths.count >= 2 {
+                let inferredDiseases = ResultLogic.multiPathSelection(paths: filteredSelectedPaths, meaningToDisease: meaningToDisease).filter{$0.disease.typical == true}
                 if inferredDiseases.isEmpty {
                     Text("No disease matched all selected meanings.")
-                        .font(.caption)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.customGray)
                 } else {
                     ForEach(Array(inferredDiseases.enumerated()), id: \.offset) { index, card in
                         VStack(alignment: .leading, spacing: 4) {
@@ -208,17 +216,26 @@ struct ResultViewNew: View {
                         .padding()
                         .background(RoundedRectangle(cornerRadius: 12).stroke())
                     }
+                    Text("💡 Tap 'More' to see other possible causes.")
+                        .foregroundColor(.customGray)
                 }
-            } else if selectedPaths.count == 1{ // path를 전부 만족하는 항목들만 보여줌 (부분 만족은 more view에서 보도록)
-                let path = selectedPaths.flatMap({$0})
+            } else if filteredSelectedPaths.count == 1{ // path를 전부 만족하는 항목들만 보여줌 (부분 만족은 more view에서 보도록)
+                let path = filteredSelectedPaths.flatMap({$0})
                 if let leafMeaning = path.last {
                     let rootNodes = meaningToCauseNode(meaning: leafMeaning, path: path).children
-                    ForEach(rootNodes) { rootNode in
-                        singlePathTreeView(node: rootNode, depth: 0, diseaseRoute: diseaseRoute)
+                    if rootNodes.isEmpty {
+                        Text("No disease matched all selected meanings.")
+                            .foregroundColor(.customGray)
+                    } else {
+                        ForEach(rootNodes) { rootNode in
+                            singlePathTreeView(node: rootNode, depth: 0, diseaseRoute: diseaseRoute)
+                        }
+                        Text("💡 Tap 'More' to see other possible causes.")
+                            .foregroundColor(.customGray)
                     }
-                    
                 }
-                Text("💡 Tap 'More' to see other possible causes")
+            } else {
+                Text("Select one or more interpretations.")
                     .foregroundColor(.customGray)
             }
         }

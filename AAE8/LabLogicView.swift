@@ -27,7 +27,7 @@ struct LogicView: View {
             }
             .padding()
         }
-        .navigationTitle("Logic Details")
+        .navigationTitle("Logic")
         .navigationBarTitleDisplayMode(.inline)
     }
     

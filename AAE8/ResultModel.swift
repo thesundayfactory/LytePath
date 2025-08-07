@@ -149,7 +149,6 @@ struct ResultLogic {
         paths: [[Meaning]],
         meaningToDisease: [Meaning: [Disease]]
     ) -> [causeCard] {
-        
         // 1. path들 간 겹치는 Meaning들은 빼기 - (e.g., Metabolic acidosis, Respiratory acidosis => Acidosis로 겹치는 경우는 의미가 없음)
         //Meaning 등장 횟수 계산
         var meaningCount: [Meaning: Int] = [:]
@@ -163,11 +162,24 @@ struct ResultLogic {
             path.filter { meaningCount[$0] == 1 }
         }
         
+//        // +) Normal 항목은 nil을 앞에 넣기 (만족하면 +, 만족 안 해도 뜨게)
+//        var finalPaths: [[Meaning?]] = []
+//        for path in filteredPaths {
+//            if let rootM = path.first {
+//                if rootM.arrow == "-" {
+//                    let newPath = [nil] + path
+//                    finalPaths.append(newPath)
+//                } else {
+//                    finalPaths.append(path)
+//                }
+//            }
+//        }
+        
         // 2. Meaning 조합 순서 정하기
         var finalMComplexes: [[Meaning]] = []
         var mComplexInProcess: [Meaning] = []
         func dfs(i: Int) {
-            if i >= filteredPaths.count {
+            if i >= paths.count {
                 finalMComplexes.append(mComplexInProcess)
                 return
             }
@@ -209,9 +221,11 @@ struct ResultLogic {
     
     private static func diseasesSatisfyingAllMeanings(meanings: [Meaning], meaningToDisease: [Meaning: [Disease]]) -> [Disease] {
         guard !meanings.isEmpty else { return [] }
-
+        
         // Convert each Meaning to a Set of Disease IDs
-        let diseaseSets: [Set<Disease>] = meanings.map { Set(meaningToDisease[$0] ?? []) }
+        let diseaseSets: [Set<Disease>] = meanings
+            //.compactMap{$0} // nil 제거. 깍두기 처리
+            .map { Set(meaningToDisease[$0] ?? []) }
 
         // Find intersection of all sets (common diseases)
         let commonDiseases = diseaseSets.dropFirst().reduce(diseaseSets[0]) { $0.intersection($1) }
@@ -220,20 +234,24 @@ struct ResultLogic {
         return Array(commonDiseases)
     }
     
-    private static func meaningComplexToMeaningPath(meaningComplex: [Meaning], paths: [[Meaning]]) -> [[Meaning]] {
+    private static func meaningComplexToMeaningPath(meaningComplex: [Meaning?], paths: [[Meaning]]) -> [[Meaning]] {
         var result: [[Meaning]] = []
         
         let totalPathNumber = paths.count
         for i in 0...totalPathNumber-1{
-            let path = paths[i]
-            var pathProcessing:[Meaning] = []
-            for m in path { // path 젤 앞에서부터 meaning 나올 때 끊기
-                pathProcessing.append(m)
-                if m == meaningComplex[i] {
-                    break
+            if meaningComplex[i] == nil {
+                continue
+            } else {
+                let path = paths[i]
+                var pathProcessing:[Meaning] = []
+                for m in path { // path 젤 앞에서부터 meaning(meaningComplex[i]) 나올 때 끊기
+                    pathProcessing.append(m)
+                    if m == meaningComplex[i] {
+                        break
+                    }
                 }
+                result.append(pathProcessing)
             }
-            result.append(pathProcessing)
         }
         
         return result
