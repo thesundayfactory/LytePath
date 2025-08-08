@@ -69,10 +69,6 @@ Each logic unit is structured in a **tree**, and users can trace the logic path 
 
 **Original Notion Database:** https://www.notion.so/LytePath_Database-22cd4a211bd680abbd49d6d49af0b9fc?source=copy_link
 
-- `LabCriteria_ver 4_new12_edited.csv`
-- `Meaning_ver 4_new12_edited.csv`
-- `Disease_ver 4_new12_edited.csv`
-
 > These files define the logic tree and diagnostic mapping.
 
 ---
