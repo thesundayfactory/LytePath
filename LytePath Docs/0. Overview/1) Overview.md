@@ -2,16 +2,28 @@
 
 LytePath is an educational app designed to analyze electrolyte abnormalities and suggest possible underlying mechanisms and diseases.
 
-## Purpose
-- Help medical students and clinicians interpret lab data
-- Provide algorithmic analysis based on Criteria → Meaning → Disease structure
-- Built for educational purposes, not for diagnostic use
+## Why LytePath?
+- Calculates key values automatically (e.g., Anion Gap, TTKG, Delta Ratio)
+- Guides you through textbook-style logic chains
+- Suggests mechanisms and potential causes based on your input
+- Highlights overlapping diagnoses across multiple electrolyte abnormalities
 
-## Main Components
-- Lab input and processing
-- Logic tree evaluation
-- Disease matching and result display
+## Who is it for?
+- Medical students
+- Internal medicine residents
+- Clinicians reviewing core physiology
 
-## References
-- Loscalzo, J., Fauci, A. S., Kasper, D. L., Hauser, S. L., & Longo, D. L. (Eds.). (2018).  Chapters 49–51. In _Harrison’s principles of internal medicine_ (20th ed.). McGraw-Hill Education.
-- Ledley, R. S., & Lusted, L. B. (1959, July 3). Reasoning foundations of medical diagnosis: Symbolic logic, probability, and value theory aid our understanding of how physicians reason. _Science_, _130_(3366), 9–21. [https://doi.org/10.1126/science.130.3366.9](https://doi.org/10.1126/science.130.3366.9)
+**Important:**
+This app is for educational use only and is not intended for real-time clinical decision-making.
+All outputs must be interpreted in the context of each patient’s clinical presentation.
+
+**Disclaimer:**
+LytePath does not provide medical advice or replace clinical judgment.
+It is not a diagnostic or treatment tool.
+
+**References:**
+- Harrison’s Principles of Internal Medicine, 20th Edition
+- The Washington Manual of Medical Therapeutics, 37th Edition
+- SNUH Manual of Medicine, 7th Edition
+
+(Clinical reasoning was adapted manually based on these sources. No copyrighted clinical decision algorithms were used.)
